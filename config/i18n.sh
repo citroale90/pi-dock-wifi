@@ -67,10 +67,10 @@ pdw_translate() {
                         printf -v PDW_MESSAGE '[WARNING] %s has no IP address. DNS will still be configured.' "${BASH_REMATCH[1]}"
                     fi
                     ;;
-                '[INFO] DNS fissato su 10.42.0.1.')
-                    pdw_regex='^\[INFO\]\ DNS\ fissato\ su\ 10\.42\.0\.1\.$'
+                '[INFO] DNS fissato su 192.168.4.1.')
+                    pdw_regex='^\[INFO\]\ DNS\ fissato\ su\ 192\.168\.4\.1\.$'
                     if [[ "$PDW_MESSAGE" =~ $pdw_regex ]]; then
-                        printf -v PDW_MESSAGE '[INFO] DNS set to 10.42.0.1.'
+                        printf -v PDW_MESSAGE '[INFO] DNS set to 192.168.4.1.'
                     fi
                     ;;
                 '[INFO] '*' già attivo')
@@ -857,10 +857,10 @@ pdw_translate() {
                         printf -v PDW_MESSAGE '[WARNING] %s senza IP. DNS verrà comunque fissato.' "${BASH_REMATCH[1]}"
                     fi
                     ;;
-                '[INFO] DNS set to 10.42.0.1.')
-                    pdw_regex='^\[INFO\]\ DNS\ set\ to\ 10\.42\.0\.1\.$'
+                '[INFO] DNS set to 192.168.4.1.')
+                    pdw_regex='^\[INFO\]\ DNS\ set\ to\ 192\.168\.4\.1\.$'
                     if [[ "$PDW_MESSAGE" =~ $pdw_regex ]]; then
-                        printf -v PDW_MESSAGE '[INFO] DNS fissato su 10.42.0.1.'
+                        printf -v PDW_MESSAGE '[INFO] DNS fissato su 192.168.4.1.'
                     fi
                     ;;
                 '[INFO] '*' is already enabled')

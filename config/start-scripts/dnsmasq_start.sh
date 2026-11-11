@@ -22,7 +22,7 @@ case "${1:-}" in
         ip link set br0 down || exit 1
         ip addr flush dev br0 || exit 1
         ip link set br0 up || exit 1
-        ip addr add 10.42.0.1/24 dev br0 || exit 1
+        ip addr add 192.168.4.1/24 dev br0 || exit 1
         ;;
     --recover)
         # Recovery starts the service without resetting the active bridge.
@@ -32,10 +32,10 @@ case "${1:-}" in
 esac
 
 for (( i=0; i<10; i++ )); do
-    if ip addr show br0 | grep 'inet 10\.42\.0\.1/' >/dev/null; then break; fi
+    if ip addr show br0 | grep 'inet 192\.168\.4\.1/' >/dev/null; then break; fi
     sleep 1
 done
-if ! ip addr show br0 | grep 'inet 10\.42\.0\.1/' >/dev/null; then
+if ! ip addr show br0 | grep 'inet 192\.168\.4\.1/' >/dev/null; then
     log "[ERROR] br0 senza indirizzo corretto; dnsmasq non verrà avviato."
     exit 1
 fi

@@ -25,7 +25,7 @@ The complete original configuration files are retained, not replaced with a redu
 | `dhcp-leasefile`, `log-queries`, `log-dhcp` | Private runtime state and diagnostics |
 
 
-In `config/dhcp/dnsmasq.conf`, `interface=br0` binds the LAN service and `bind-dynamic` follows interface availability. The example pool is `10.42.0.50–10.42.0.250`, lease `12h`. DHCP option 3 announces router `10.42.0.1`; option 6 announces its DNS on standard port 53. `server=10.42.0.1#15353` forwards to Pi-hole, while `no-resolv` prevents resolver loops. `domain=local`, `local=/local/`, `expand-hosts` and `rebind-domain-ok=/nat/` retain local naming and the original specific rebind exception. The lease file is private runtime state. `log-queries` and `log-dhcp` are diagnostic logs that must not be published.
+In `config/dhcp/dnsmasq.conf`, `interface=br0` binds the LAN service and `bind-dynamic` follows interface availability. The example pool is `192.168.4.50–192.168.4.250`, lease `12h`. DHCP option 3 announces router `192.168.4.1`; option 6 announces its DNS on standard port 53. `server=192.168.4.1#15353` forwards to Pi-hole, while `no-resolv` prevents resolver loops. `domain=local`, `local=/local/`, `expand-hosts` and `rebind-domain-ok=/nat/` retain local naming and the original specific rebind exception. The lease file is private runtime state. `log-queries` and `log-dhcp` are diagnostic logs that must not be published.
 
 All **25 original reservations** are retained as disabled examples with fictitious MACs and `example-device-NN` hostnames. Replace MAC, IP and hostname before enabling a line. Preserve unique addresses and the original `set:no_route` tags where intended.
 
@@ -63,7 +63,7 @@ The original ebtables rule affects host bridge FORWARD rather than a newly isola
 
 ## Customize the example network
 
-Changing `10.42.0.0/24` requires consistent updates:
+Changing `192.168.4.0/24` requires consistent updates:
 
 | File | Values to adjust |
 |---|---|
@@ -73,6 +73,7 @@ Changing `10.42.0.0/24` requires consistent updates:
 | `config/healthcheck.sh` | Expected `BRIDGE_ADDRESS` |
 | `config/dhcp/dhclient.conf` | Reference resolver |
 | `config/iptables/iptables-rules.sh` | LAN restriction subnet; uplink/VPN interfaces |
+| `i18n/logs.json` and `config/i18n.sh` | Italian/English log messages and matchers containing the DNS address; keep the catalogue and runtime consistent |
 | `.env` | Isolated-device addresses and extra routes |
 | `config/recovery/config.json` | Expected **uplink** network/gateway, separate from LAN |
 

@@ -73,8 +73,8 @@
   },
   {
     "id": 13,
-    "it": "[INFO] DNS fissato su 10.42.0.1.",
-    "en": "[INFO] DNS set to 10.42.0.1.",
+    "it": "[INFO] DNS fissato su 192.168.4.1.",
+    "en": "[INFO] DNS set to 192.168.4.1.",
     "arguments": 0
   },
   {

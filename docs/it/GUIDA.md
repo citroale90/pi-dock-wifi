@@ -56,7 +56,7 @@ Per il WPS comune le due radio condividono UUID, SSID e password. Impostare `APP
 
 ### 2. Definire rete e uplink
 
-La LAN d’esempio è `10.42.0.0/24`, router `10.42.0.1`. Deve essere distinta dalla rete dell’uplink. Per cambiarla, seguire l’elenco delle [occorrenze da aggiornare](RETE.md#personalizzare-la-rete-di-esempio): modificare una sola riga non basta.
+La LAN predefinita è `192.168.4.0/24`, router `192.168.4.1`, come nel progetto originale e nei suoi script di avvio e controllo. Deve essere distinta dalla rete dell’uplink. Per cambiarla, seguire l’elenco delle [occorrenze da aggiornare](RETE.md#personalizzare-la-rete-di-esempio): modificare una sola riga non basta.
 
 ```sh
 cp config/recovery/config.json.example config/recovery/config.json
@@ -116,8 +116,8 @@ La build riguarda `pi-dock-wifi` e `ttyd`. Pi-hole usa direttamente **`pihole/pi
 
 | Aprire dalla LAN | Credenziale |
 |---|---|
-| `http://10.42.0.1:8888` | `DASHBOARD_PASSWORD` |
-| `http://10.42.0.1:8090/admin/` | `PIHOLE_PASSWORD` |
+| `http://192.168.4.1:8888` | `DASHBOARD_PASSWORD` |
+| `http://192.168.4.1:8090/admin/` | `PIHOLE_PASSWORD` |
 
 Il terminale passa da `/terminal/`; ttyd non viene esposto direttamente. La pagina contiene il riferimento mDNS `pi-dock-wifi.local`: usare un hostname coerente oppure adattare quel riferimento prima della build. Per l’amministrazione remota usare VPN o un reverse proxy TLS gestito dall’installatore.
 

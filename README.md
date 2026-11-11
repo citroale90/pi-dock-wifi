@@ -78,10 +78,10 @@ docker compose up -d
 
 | Accesso dalla LAN di esempio | Indirizzo |
 |---|---|
-| Dashboard e terminale | `http://10.42.0.1:8888` |
-| Pi-hole | `http://10.42.0.1:8090/admin/` |
+| Dashboard e terminale | `http://192.168.4.1:8888` |
+| Pi-hole | `http://192.168.4.1:8090/admin/` |
 
-La LAN di esempio è `10.42.0.0/24`. Non contiene prenotazioni o credenziali reali; adattala alla tua rete prima di usarla.
+La LAN predefinita è **`192.168.4.0/24`**, con router **`192.168.4.1`**: mantiene la numerazione del progetto originale per compatibilità con gli script di avvio e controllo. MAC, nomi dei dispositivi e credenziali sono sostituiti da esempi o segnaposto. Verifica che la rete dell’uplink sia diversa dalla LAN prima dell’avvio.
 
 ## Italiano e inglese
 

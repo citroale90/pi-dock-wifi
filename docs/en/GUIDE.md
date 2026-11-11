@@ -56,7 +56,7 @@ Shared WPS requires both radios to use the same UUID, SSID and passphrase. Selec
 
 ### 2. Define LAN and uplink
 
-The example LAN is `10.42.0.0/24`, router `10.42.0.1`; it must differ from the uplink network. Follow the [consistent-address checklist](NETWORK.md#customize-the-example-network) when changing it; editing a single occurrence is insufficient.
+The default LAN is `192.168.4.0/24`, router `192.168.4.1`, matching the original project and its startup and monitoring scripts. It must differ from the uplink network. Follow the [consistent-address checklist](NETWORK.md#customize-the-example-network) when changing it; editing a single occurrence is insufficient.
 
 ```sh
 cp config/recovery/config.json.example config/recovery/config.json
@@ -116,8 +116,8 @@ The build covers `pi-dock-wifi` and `ttyd`. Pi-hole uses **`pihole/pihole:2026.1
 
 | Open from the LAN | Credential |
 |---|---|
-| `http://10.42.0.1:8888` | `DASHBOARD_PASSWORD` |
-| `http://10.42.0.1:8090/admin/` | `PIHOLE_PASSWORD` |
+| `http://192.168.4.1:8888` | `DASHBOARD_PASSWORD` |
+| `http://192.168.4.1:8090/admin/` | `PIHOLE_PASSWORD` |
 
 The terminal is proxied through `/terminal/`; ttyd is not exposed directly. The page references `pi-dock-wifi.local`: use a matching hostname or adapt it before building. Use a VPN or your own TLS reverse proxy for remote administration.
 

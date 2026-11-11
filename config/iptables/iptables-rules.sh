@@ -104,8 +104,8 @@ ebtables -A FORWARD -p IPv4 --ip-proto udp --ip-sport 67 -j DROP
 #
 # THIS ROUTER
 #   $INTERNET / eth0 = 192.0.2.2
-#   br0              = 10.42.0.1
-# Traduzione / Translation: Questo router: uplink $INTERNET/eth0 192.0.2.2; LAN br0 10.42.0.1
+#   br0              = 192.168.4.1
+# Traduzione / Translation: Questo router: uplink $INTERNET/eth0 192.0.2.2; LAN br0 192.168.4.1
 #
 # Il modem è il firewall perimetrale e inoltra verso la LAN i servizi
 # pubblicati su Internet. Questa regola consente anche NUOVE connessioni
@@ -137,7 +137,7 @@ if [[ -n "${ISOLATED_DEVICE_1_IP:-}" ]]; then
 
 iptables -A pi-dock-wifi-filter -i wt0 -d "${ISOLATED_DEVICE_1_IP}" -j ACCEPT
 iptables -A pi-dock-wifi-filter -o wt0 -s "${ISOLATED_DEVICE_1_IP}" -j ACCEPT
-iptables -A pi-dock-wifi-filter -s "${ISOLATED_DEVICE_1_IP}" -d 10.42.0.0/24 -j ACCEPT
+iptables -A pi-dock-wifi-filter -s "${ISOLATED_DEVICE_1_IP}" -d 192.168.4.0/24 -j ACCEPT
 iptables -A pi-dock-wifi-filter -s "${ISOLATED_DEVICE_1_IP}" -j REJECT
 
 
@@ -153,7 +153,7 @@ if [[ -n "${ISOLATED_DEVICE_2_IP:-}" ]]; then
 
 iptables -A pi-dock-wifi-filter -i wt0 -d "${ISOLATED_DEVICE_2_IP}" -j ACCEPT
 iptables -A pi-dock-wifi-filter -o wt0 -s "${ISOLATED_DEVICE_2_IP}" -j ACCEPT
-iptables -A pi-dock-wifi-filter -s "${ISOLATED_DEVICE_2_IP}" -d 10.42.0.0/24 -j ACCEPT
+iptables -A pi-dock-wifi-filter -s "${ISOLATED_DEVICE_2_IP}" -d 192.168.4.0/24 -j ACCEPT
 iptables -A pi-dock-wifi-filter -s "${ISOLATED_DEVICE_2_IP}" -j REJECT
 
 

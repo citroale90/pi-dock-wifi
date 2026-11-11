@@ -129,9 +129,9 @@ obtain_ip_dhcp() {
     fi
 
     chattr -i /etc/resolv.conf 2>/dev/null || true
-    printf "nameserver 10.42.0.1\nnameserver 1.1.1.1\n" > /etc/resolv.conf || return 1
+    printf "nameserver 192.168.4.1\nnameserver 1.1.1.1\n" > /etc/resolv.conf || return 1
     chattr +i /etc/resolv.conf || true
-    log "[INFO] DNS fissato su 10.42.0.1."
+    log "[INFO] DNS fissato su 192.168.4.1."
 }
 
 setup_nat() {

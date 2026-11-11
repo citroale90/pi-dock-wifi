@@ -16,13 +16,13 @@ File: `config/dhcp/dnsmasq.conf`.
 |---|---|
 | `interface=br0` | Il servizio DHCP/DNS è associato al bridge LAN; le radio confluiscono nel bridge |
 | `bind-dynamic` | Segue la disponibilità dell’interfaccia invece di richiedere che tutti gli indirizzi siano pronti all’avvio |
-| `dhcp-range=10.42.0.50,10.42.0.250,12h` | Pool dinamico inclusivo e durata del lease. Cambiare entrambi gli estremi insieme alla subnet del router |
-| `dhcp-option=3,10.42.0.1` | Router predefinito annunciato ai client |
-| `dhcp-option=6,10.42.0.1` | DNS annunciato ai client; il client usa la porta standard 53 |
+| `dhcp-range=192.168.4.50,192.168.4.250,12h` | Pool dinamico inclusivo e durata del lease. Cambiare entrambi gli estremi insieme alla subnet del router |
+| `dhcp-option=3,192.168.4.1` | Router predefinito annunciato ai client |
+| `dhcp-option=6,192.168.4.1` | DNS annunciato ai client; il client usa la porta standard 53 |
 | `dhcp-option=tag:no_route,121,...` | Variante originale delle rotte classless per client marcati `no_route`: soltanto default route |
 | `dhcp-option=tag:!no_route,121,...` | Variante originale per gli altri client: default route più rete aggiuntiva tramite il next-hop LAN |
 | `dhcp-host=MAC,set:no_route,IP,NOME` | Prenotazione che assegna anche il tag usato per scegliere la variante 121 |
-| `server=10.42.0.1#15353` | dnsmasq inoltra le richieste a Pi-hole sulla porta dedicata, senza competere per la 53 |
+| `server=192.168.4.1#15353` | dnsmasq inoltra le richieste a Pi-hole sulla porta dedicata, senza competere per la 53 |
 | `no-resolv` | Non legge resolver dell’host, evitando che l’inoltro ricada su se stesso |
 | `domain=local`, `local=/local/` | Dominio locale originale; cambiarlo in modo coerente se si sceglie un altro dominio |
 | `rebind-domain-ok=/nat/` | Eccezione originale per quel suffisso, non una disattivazione generale della protezione |
@@ -67,7 +67,7 @@ La regola ebtables originale interessa FORWARD del bridge host, non una nuova ca
 
 ## Personalizzare la rete di esempio
 
-Una rete diversa da `10.42.0.0/24` richiede aggiornamenti coerenti:
+Una rete diversa da `192.168.4.0/24` richiede aggiornamenti coerenti:
 
 | File | Valori da adeguare |
 |---|---|
@@ -77,12 +77,13 @@ Una rete diversa da `10.42.0.0/24` richiede aggiornamenti coerenti:
 | `config/healthcheck.sh` | `BRIDGE_ADDRESS` atteso |
 | `config/dhcp/dhclient.conf` | Resolver del file di riferimento |
 | `config/iptables/iptables-rules.sh` | Subnet LAN delle restrizioni; interfacce uplink e VPN |
+| `i18n/logs.json` e `config/i18n.sh` | Messaggi e matcher dei log italiani/inglesi che riportano l’indirizzo DNS; mantenere coerenti catalogo e runtime |
 | `.env` | IP dei due dispositivi isolati e rotte aggiuntive |
 | `config/recovery/config.json` | Rete/gateway **dell’uplink**, separati dalla LAN |
 
 ### Controllo prima dell’avvio
 
-- Rete LAN di esempio `10.42.0.0/24`, gateway `10.42.0.1`, pool, prenotazioni e next-hop.
+- Rete LAN di esempio `192.168.4.0/24`, gateway `192.168.4.1`, pool, prenotazioni e next-hop.
 - Interfacce `eth0`, `br0`, `wlan0`, `wlan1`, `wt0` e capacità reali delle radio.
 - I due IP opzionali dei dispositivi isolati, senza indirizzi di persone estranee.
 - Rotte DHCP opzione 121, tag `no_route`, rotte del router e percorso di ritorno.

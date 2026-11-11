@@ -128,7 +128,7 @@ restart_container() {
 # --- Check 1: br0 ha un IP? ---
 # Traduzione / Translation: Check 1: does br0 have an IP address?
 BRIDGE=br0
-BRIDGE_ADDRESS=10.42.0.1/24
+BRIDGE_ADDRESS=192.168.4.1/24
 bridge_has_expected_address() {
     ip -4 -o addr show dev "$BRIDGE" 2>/dev/null | awk -v expected="$BRIDGE_ADDRESS" '
         $4 == expected { found=1 }
