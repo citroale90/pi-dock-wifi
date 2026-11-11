@@ -16,11 +16,12 @@
 ## Il router realizzato
 
 <p align="center">
-  <a href="docs/assets/router-assembled.jpg"><img src="docs/assets/router-assembled.jpg" alt="Vista completa del router Pi-Dock-Wifi assemblato, con antenne e struttura a livelli" width="46%"></a>
-  <a href="docs/assets/router-hardware-detail.jpg"><img src="docs/assets/router-hardware-detail.jpg" alt="Dettaglio degli HAT, del cablaggio e della scheda di alimentazione P01" width="46%"></a>
+  <a href="docs/assets/router-assembled.jpg"><img src="docs/assets/router-assembled.jpg" alt="Vista completa del router Pi-Dock-Wifi assemblato, con antenne e struttura a livelli" width="30%"></a>
+  <a href="docs/assets/router-assembled-alternate.jpg"><img src="docs/assets/router-assembled-alternate.jpg" alt="Router Pi-Dock-Wifi da un’altra angolazione, con antenne, dissipatori e schede sovrapposte" width="30%"></a>
+  <a href="docs/assets/router-hardware-detail.jpg"><img src="docs/assets/router-hardware-detail.jpg" alt="Dettaglio degli HAT, del cablaggio e della scheda di alimentazione P01" width="30%"></a>
 </p>
 
-<p align="center"><em>Vista completa e dettaglio del montaggio. Apri le foto per visualizzarle a piena risoluzione.</em></p>
+<p align="center"><em>Due viste del router e un dettaglio del montaggio. Apri le foto per visualizzarle a piena risoluzione.</em></p>
 
 ## Cosa puoi controllare
 

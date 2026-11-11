@@ -16,11 +16,12 @@
 ## Assembled router
 
 <p align="center">
-  <a href="docs/assets/router-assembled.jpg"><img src="docs/assets/router-assembled.jpg" alt="Full view of the assembled Pi-Dock-Wifi router, antennas and stacked structure" width="46%"></a>
-  <a href="docs/assets/router-hardware-detail.jpg"><img src="docs/assets/router-hardware-detail.jpg" alt="Close-up of the HATs, cabling and P01 power board" width="46%"></a>
+  <a href="docs/assets/router-assembled.jpg"><img src="docs/assets/router-assembled.jpg" alt="Full view of the assembled Pi-Dock-Wifi router, antennas and stacked structure" width="30%"></a>
+  <a href="docs/assets/router-assembled-alternate.jpg"><img src="docs/assets/router-assembled-alternate.jpg" alt="Alternate view of the Pi-Dock-Wifi router, antennas, heatsinks and stacked boards" width="30%"></a>
+  <a href="docs/assets/router-hardware-detail.jpg"><img src="docs/assets/router-hardware-detail.jpg" alt="Close-up of the HATs, cabling and P01 power board" width="30%"></a>
 </p>
 
-<p align="center"><em>Full view and assembly detail. Open either photo to view it at full resolution.</em></p>
+<p align="center"><em>Two views of the router and an assembly close-up. Open any photo to view it at full resolution.</em></p>
 
 ## What you control
 
