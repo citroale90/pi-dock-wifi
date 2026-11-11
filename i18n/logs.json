@@ -1,0 +1,836 @@
+[
+  {
+    "id": 1,
+    "it": "APP_LANGUAGE deve essere it oppure en",
+    "en": "APP_LANGUAGE must be it or en",
+    "arguments": 0
+  },
+  {
+    "id": 2,
+    "it": "[FATAL] Errore alla riga {0}: comando \"{1}\" (exit code {2})",
+    "en": "[FATAL] Error at line {0}: command \"{1}\" (exit code {2})",
+    "arguments": 3
+  },
+  {
+    "id": 3,
+    "it": "[STEP] {0}...",
+    "en": "[STEP] {0}...",
+    "arguments": 1
+  },
+  {
+    "id": 4,
+    "it": "[FAIL] {0} (exit code {1})",
+    "en": "[FAIL] {0} (exit code {1})",
+    "arguments": 2
+  },
+  {
+    "id": 5,
+    "it": "[ERROR] Configurare {0} in .env prima dell'avvio.",
+    "en": "[ERROR] Configure {0} in .env before starting.",
+    "arguments": 1
+  },
+  {
+    "id": 6,
+    "it": "[ERROR] Configurare WPS_UUID in .env",
+    "en": "[ERROR] Configure WPS_UUID in .env",
+    "arguments": 0
+  },
+  {
+    "id": 7,
+    "it": "[ERROR] Variabile d'ambiente '{0}' non definita.",
+    "en": "[ERROR] Environment variable '{0}' is not defined.",
+    "arguments": 1
+  },
+  {
+    "id": 8,
+    "it": "[ERROR] Manca la privileged mode.",
+    "en": "[ERROR] Privileged mode is required.",
+    "arguments": 0
+  },
+  {
+    "id": 9,
+    "it": "[WARNING] check_nsswitch.sh errore (continuo)",
+    "en": "[WARNING] check_nsswitch.sh failed (continuing)",
+    "arguments": 0
+  },
+  {
+    "id": 10,
+    "it": "[ERROR] Interfaccia {0} non esiste!",
+    "en": "[ERROR] Interface {0} does not exist!",
+    "arguments": 1
+  },
+  {
+    "id": 11,
+    "it": "[INFO] {0} ha un IP.",
+    "en": "[INFO] {0} has an IP address.",
+    "arguments": 1
+  },
+  {
+    "id": 12,
+    "it": "[WARNING] {0} senza IP. DNS verrà comunque fissato.",
+    "en": "[WARNING] {0} has no IP address. DNS will still be configured.",
+    "arguments": 1
+  },
+  {
+    "id": 13,
+    "it": "[INFO] DNS fissato su 10.42.0.1.",
+    "en": "[INFO] DNS set to 10.42.0.1.",
+    "arguments": 0
+  },
+  {
+    "id": 14,
+    "it": "[INFO] {0} già attivo",
+    "en": "[INFO] {0} is already enabled",
+    "arguments": 1
+  },
+  {
+    "id": 15,
+    "it": "[INFO] {0} attivato",
+    "en": "[INFO] {0} enabled",
+    "arguments": 1
+  },
+  {
+    "id": 16,
+    "it": "[ERROR] /bin/iptables-rules.sh non trovato",
+    "en": "[ERROR] /bin/iptables-rules.sh not found",
+    "arguments": 0
+  },
+  {
+    "id": 17,
+    "it": "[ERROR] Sblocco WiFi fallito",
+    "en": "[ERROR] Failed to unblock Wi-Fi",
+    "arguments": 0
+  },
+  {
+    "id": 18,
+    "it": "[INFO] WiFi sbloccato: {0}",
+    "en": "[INFO] Wi-Fi unblocked: {0}",
+    "arguments": 1
+  },
+  {
+    "id": 19,
+    "it": "[INFO] Nessuna interfaccia WiFi bloccata.",
+    "en": "[INFO] No Wi-Fi interfaces are blocked.",
+    "arguments": 0
+  },
+  {
+    "id": 20,
+    "it": "[INFO] br0 esiste, ricreo...",
+    "en": "[INFO] br0 exists; recreating it...",
+    "arguments": 0
+  },
+  {
+    "id": 21,
+    "it": "[ERROR] Creazione br0 fallita",
+    "en": "[ERROR] Failed to create br0",
+    "arguments": 0
+  },
+  {
+    "id": 22,
+    "it": "[INFO] Bridge br0 creato.",
+    "en": "[INFO] Bridge br0 created.",
+    "arguments": 0
+  },
+  {
+    "id": 23,
+    "it": "[INFO] skip_check presente, salto hostapd",
+    "en": "[INFO] skip_check is present; skipping hostapd",
+    "arguments": 0
+  },
+  {
+    "id": 24,
+    "it": "[ERROR] CONFIG_FILES vuota",
+    "en": "[ERROR] CONFIG_FILES is empty",
+    "arguments": 0
+  },
+  {
+    "id": 25,
+    "it": "[ERROR] Hostapd non avviato (exit code {0})",
+    "en": "[ERROR] Hostapd did not start (exit code {0})",
+    "arguments": 1
+  },
+  {
+    "id": 26,
+    "it": "[ERROR] Interfacce non nel bridge dopo {0}s",
+    "en": "[ERROR] Interfaces did not join the bridge within {0}s",
+    "arguments": 1
+  },
+  {
+    "id": 27,
+    "it": "[ERROR] hostapd morto durante init bridge",
+    "en": "[ERROR] hostapd exited during bridge initialization",
+    "arguments": 0
+  },
+  {
+    "id": 28,
+    "it": "[INFO]   {0} → br0 OK",
+    "en": "[INFO]   {0} → br0 OK",
+    "arguments": 1
+  },
+  {
+    "id": 29,
+    "it": "[WARN]   {0} → br0 MANCANTE",
+    "en": "[WARN]   {0} → br0 MISSING",
+    "arguments": 1
+  },
+  {
+    "id": 30,
+    "it": "[INFO] Dnsmasq e socket DHCP pronti dopo {0}s.",
+    "en": "[INFO] Dnsmasq and DHCP socket ready after {0}s.",
+    "arguments": 1
+  },
+  {
+    "id": 31,
+    "it": "[ERROR] Avvio dnsmasq fallito (exit code {0})",
+    "en": "[ERROR] Failed to start dnsmasq (exit code {0})",
+    "arguments": 1
+  },
+  {
+    "id": 32,
+    "it": "[ERROR] DHCP non pronto dopo {0}s",
+    "en": "[ERROR] DHCP is not ready after {0}s",
+    "arguments": 1
+  },
+  {
+    "id": 33,
+    "it": "[ERROR] fcgiwrap socket non creato",
+    "en": "[ERROR] fcgiwrap socket was not created",
+    "arguments": 0
+  },
+  {
+    "id": 34,
+    "it": "[INFO] fcgiwrap avviato",
+    "en": "[INFO] fcgiwrap started",
+    "arguments": 0
+  },
+  {
+    "id": 35,
+    "it": "[ERROR] nginx non partito",
+    "en": "[ERROR] nginx did not start",
+    "arguments": 0
+  },
+  {
+    "id": 36,
+    "it": "[INFO] nginx avviato su porta 8888 (login e rotazione log attivi)",
+    "en": "[INFO] nginx started on port 8888 (sign-in and log rotation enabled)",
+    "arguments": 0
+  },
+  {
+    "id": 37,
+    "it": "[ERROR] Healthcheck unhealthy. Terminazione...",
+    "en": "[ERROR] Healthcheck is unhealthy. Terminating...",
+    "arguments": 0
+  },
+  {
+    "id": 38,
+    "it": "[INFO] Cleanup in corso...",
+    "en": "[INFO] Cleanup in progress...",
+    "arguments": 0
+  },
+  {
+    "id": 39,
+    "it": "[INFO] Cleanup completato.",
+    "en": "[INFO] Cleanup completed.",
+    "arguments": 0
+  },
+  {
+    "id": 40,
+    "it": "[ERROR] Ricevuto {0} dopo un guasto locale confermato; arresto controllato.",
+    "en": "[ERROR] Received {0} after a confirmed local fault; controlled container shutdown.",
+    "arguments": 1
+  },
+  {
+    "id": 41,
+    "it": "[INFO] Ricevuto {0}; arresto richiesto, non un errore INIT.",
+    "en": "[INFO] Received {0}; shutdown requested, not an INIT error.",
+    "arguments": 1
+  },
+  {
+    "id": 42,
+    "it": "[INFO] === INIT === (PID {0})",
+    "en": "[INFO] === INIT === (PID {0})",
+    "arguments": 1
+  },
+  {
+    "id": 43,
+    "it": "Verifica variabili",
+    "en": "Check variables",
+    "arguments": 0
+  },
+  {
+    "id": 44,
+    "it": "Verifica nsswitch",
+    "en": "Check nsswitch",
+    "arguments": 0
+  },
+  {
+    "id": 45,
+    "it": "Configurazione DNS",
+    "en": "Configure DNS",
+    "arguments": 0
+  },
+  {
+    "id": 46,
+    "it": "Configurazione NAT",
+    "en": "Configure NAT",
+    "arguments": 0
+  },
+  {
+    "id": 47,
+    "it": "Sblocco WiFi",
+    "en": "Unblock Wi-Fi",
+    "arguments": 0
+  },
+  {
+    "id": 48,
+    "it": "Regole iptables",
+    "en": "Iptables rules",
+    "arguments": 0
+  },
+  {
+    "id": 49,
+    "it": "Configurazione bridge",
+    "en": "Configure bridge",
+    "arguments": 0
+  },
+  {
+    "id": 50,
+    "it": "Avvio hostapd",
+    "en": "Start hostapd",
+    "arguments": 0
+  },
+  {
+    "id": 51,
+    "it": "Avvio dnsmasq",
+    "en": "Start dnsmasq",
+    "arguments": 0
+  },
+  {
+    "id": 52,
+    "it": "Rotte LAN",
+    "en": "LAN Routes",
+    "arguments": 0
+  },
+  {
+    "id": 53,
+    "it": "[INFO] === INIT completata in {0}s ===",
+    "en": "[INFO] === INIT completed in {0}s ===",
+    "arguments": 1
+  },
+  {
+    "id": 54,
+    "it": "Avvio webserver",
+    "en": "Start web server",
+    "arguments": 0
+  },
+  {
+    "id": 55,
+    "it": "[WARN] Webserver non partito — dashboard offline",
+    "en": "[WARN] Web server did not start — dashboard offline",
+    "arguments": 0
+  },
+  {
+    "id": 56,
+    "it": "[ERROR] Impossibile pubblicare il marcatore di avvio corrente.",
+    "en": "[ERROR] Cannot publish the current startup marker.",
+    "arguments": 0
+  },
+  {
+    "id": 57,
+    "it": "[INFO] === Tutti i servizi avviati ===",
+    "en": "[INFO] === All services started ===",
+    "arguments": 0
+  },
+  {
+    "id": 58,
+    "it": "[WARN] Tutti i processi di monitoraggio sono terminati.",
+    "en": "[WARN] All monitoring processes have exited.",
+    "arguments": 0
+  },
+  {
+    "id": 59,
+    "it": "[ERROR] Attesa dei processi runtime terminata (exit code {0}).",
+    "en": "[ERROR] Waiting for runtime processes ended (exit code {0}).",
+    "arguments": 1
+  },
+  {
+    "id": 60,
+    "it": "[INFO] Startup non completato, salto healthcheck",
+    "en": "[INFO] Startup is not complete; skipping healthcheck",
+    "arguments": 0
+  },
+  {
+    "id": 61,
+    "it": "[INFO] Restart in corso, salto healthcheck",
+    "en": "[INFO] Restart in progress; skipping healthcheck",
+    "arguments": 0
+  },
+  {
+    "id": 62,
+    "it": "[ERROR] RESTART: {0}",
+    "en": "[ERROR] RESTART: {0}",
+    "arguments": 1
+  },
+  {
+    "id": 63,
+    "it": "[INFO] hostapd terminato",
+    "en": "[INFO] hostapd terminated",
+    "arguments": 0
+  },
+  {
+    "id": 64,
+    "it": "[WARN] {0} inattivo o senza {1}, tento recovery...",
+    "en": "[WARN] {0} is down or missing {1}; attempting recovery...",
+    "arguments": 2
+  },
+  {
+    "id": 65,
+    "it": "[INFO] {0} stato e indirizzo ripristinati con successo",
+    "en": "[INFO] {0} state and address restored successfully",
+    "arguments": 1
+  },
+  {
+    "id": 66,
+    "it": "[ERROR] {0} non recuperabile",
+    "en": "[ERROR] Cannot recover {0}",
+    "arguments": 1
+  },
+  {
+    "id": 67,
+    "it": "[ERROR] hostapd non in esecuzione",
+    "en": "[ERROR] hostapd is not running",
+    "arguments": 0
+  },
+  {
+    "id": 68,
+    "it": "[WARN] Socket hostapd mancante per {0}",
+    "en": "[WARN] Missing hostapd socket for {0}",
+    "arguments": 1
+  },
+  {
+    "id": 69,
+    "it": "[WARN] hostapd non risponde su {0}",
+    "en": "[WARN] hostapd is not responding on {0}",
+    "arguments": 1
+  },
+  {
+    "id": 70,
+    "it": "[WARN] Radio {0} non operativa",
+    "en": "[WARN] Radio {0} is not operational",
+    "arguments": 1
+  },
+  {
+    "id": 71,
+    "it": "[WARN] {0} inattiva o non collegata a {1}",
+    "en": "[WARN] {0} is down or not attached to {1}",
+    "arguments": 2
+  },
+  {
+    "id": 72,
+    "it": "[INFO] dnsmasq tornato attivo da solo",
+    "en": "[INFO] dnsmasq recovered on its own",
+    "arguments": 0
+  },
+  {
+    "id": 73,
+    "it": "[ERROR] dnsmasq presente ma DHCP non in ascolto; nessun avvio duplicato",
+    "en": "[ERROR] dnsmasq exists but DHCP is not listening; not starting a duplicate",
+    "arguments": 0
+  },
+  {
+    "id": 74,
+    "it": "[ERROR] dnsmasq morto e br0 senza IP — skip recovery",
+    "en": "[ERROR] dnsmasq exited and br0 has no IP address — skipping recovery",
+    "arguments": 0
+  },
+  {
+    "id": 75,
+    "it": "[WARN] dnsmasq non attivo, riavvio...",
+    "en": "[WARN] dnsmasq is not running; restarting...",
+    "arguments": 0
+  },
+  {
+    "id": 76,
+    "it": "[INFO] dnsmasq riavviato con log + rotazione",
+    "en": "[INFO] dnsmasq restarted with logging and rotation",
+    "arguments": 0
+  },
+  {
+    "id": 77,
+    "it": "[ERROR] dnsmasq non recuperabile",
+    "en": "[ERROR] Cannot recover dnsmasq",
+    "arguments": 0
+  },
+  {
+    "id": 78,
+    "it": "[OK] Servizi locali Wi-Fi/DHCP/rotte sani; Ethernet: {0}. Internet non verificata da questo healthcheck.",
+    "en": "[OK] Local Wi-Fi/DHCP/routes are healthy; Ethernet: {0}. This healthcheck does not verify Internet access.",
+    "arguments": 1
+  },
+  {
+    "id": 79,
+    "it": "[WARN] Servizi locali Wi-Fi/DHCP/rotte sani; Ethernet degradata: {0}. Nessun riavvio della LAN per un guasto a monte.",
+    "en": "[WARN] Local Wi-Fi/DHCP/routes are healthy; Ethernet is degraded: {0}. The LAN will not restart for an upstream fault.",
+    "arguments": 1
+  },
+  {
+    "id": 80,
+    "it": "[WARN] Problemi: {0} (fallimento {1}/{2})",
+    "en": "[WARN] Problems: {0} (failure {1}/{2})",
+    "arguments": 3
+  },
+  {
+    "id": 81,
+    "it": "[INFO] dnsmasq già attivo, nessun avvio duplicato.",
+    "en": "[INFO] dnsmasq is already running; not starting a duplicate.",
+    "arguments": 0
+  },
+  {
+    "id": 82,
+    "it": "[ERROR] Argomento dnsmasq_start non valido",
+    "en": "[ERROR] Invalid dnsmasq_start argument",
+    "arguments": 0
+  },
+  {
+    "id": 83,
+    "it": "[ERROR] br0 senza indirizzo corretto; dnsmasq non verrà avviato.",
+    "en": "[ERROR] br0 has no valid address; dnsmasq will not start.",
+    "arguments": 0
+  },
+  {
+    "id": 84,
+    "it": "[INFO] dnsmasq arrestato regolarmente.",
+    "en": "[INFO] dnsmasq stopped normally.",
+    "arguments": 0
+  },
+  {
+    "id": 85,
+    "it": "[WARN] dnsmasq terminato inaspettatamente (exit code {0})",
+    "en": "[WARN] dnsmasq exited unexpectedly (exit code {0})",
+    "arguments": 1
+  },
+  {
+    "id": 86,
+    "it": "[ERROR] Argomento server-routes non valido",
+    "en": "[ERROR] Invalid server-routes argument",
+    "arguments": 0
+  },
+  {
+    "id": 87,
+    "it": "[INFO] Avvio configurazione routes...",
+    "en": "[INFO] Configuring routes...",
+    "arguments": 0
+  },
+  {
+    "id": 88,
+    "it": "[INFO] OK: {0} via {1} è già configurata.",
+    "en": "[INFO] OK: {0} via {1} is already configured.",
+    "arguments": 2
+  },
+  {
+    "id": 89,
+    "it": "[INFO] Rotta impostata: {0} via {1}",
+    "en": "[INFO] Route set: {0} via {1}",
+    "arguments": 2
+  },
+  {
+    "id": 90,
+    "it": "[ERROR] Impossibile impostare {0} via {1}. Verifica permessi/connettività.",
+    "en": "[ERROR] Cannot set {0} via {1}. Check permissions/connectivity.",
+    "arguments": 2
+  },
+  {
+    "id": 91,
+    "it": "[INFO] Ethernet {0} configurata: {1}, gateway {2}. Recupero Ethernet integrato in questo container tramite NetworkManager.",
+    "en": "[INFO] Ethernet {0} configured: {1}, gateway {2}. Ethernet recovery is integrated into this container through NetworkManager.",
+    "arguments": 3
+  },
+  {
+    "id": 92,
+    "it": "[WARN] Ethernet {0}: carrier assente. Wi-Fi/LAN mantenuti; attendo il collegamento fisico, nessun reset ciclico.",
+    "en": "[WARN] Ethernet {0}: no carrier. Wi-Fi/LAN remain active; waiting for the physical link without repeated resets.",
+    "arguments": 1
+  },
+  {
+    "id": 93,
+    "it": "[WARN] Ethernet {0}: {1}. Wi-Fi/LAN mantenuti; Il recupero integrato gestisce il ripristino tramite NetworkManager.",
+    "en": "[WARN] Ethernet {0}: {1}. Wi-Fi/LAN remain active; integrated recovery uses NetworkManager to restore the uplink.",
+    "arguments": 2
+  },
+  {
+    "id": 94,
+    "it": "[INFO] Riga 'hosts:' sostituita con successo tramite reindirizzamento.",
+    "en": "[INFO] The 'hosts:' line was replaced successfully through redirection.",
+    "arguments": 0
+  },
+  {
+    "id": 95,
+    "it": "[ERROR] Impossibile sovrascrivere {0}. Permessi insufficienti o file system RO.",
+    "en": "[ERROR] Cannot overwrite {0}. Insufficient permissions or read-only filesystem.",
+    "arguments": 1
+  },
+  {
+    "id": 96,
+    "it": "[INFO] Verifica finale: la configurazione è corretta.",
+    "en": "[INFO] Final verification: the configuration is correct.",
+    "arguments": 0
+  },
+  {
+    "id": 97,
+    "it": "[ERROR] La modifica ha avuto esito, ma la verifica finale ha fallito.",
+    "en": "[ERROR] The change succeeded, but final verification failed.",
+    "arguments": 0
+  },
+  {
+    "id": 98,
+    "it": "[ERROR] Errore durante l'esecuzione di sed sul file temporaneo.",
+    "en": "[ERROR] sed failed on the temporary file.",
+    "arguments": 0
+  },
+  {
+    "id": 99,
+    "it": "[FATAL] File mancante: {0}",
+    "en": "[FATAL] Missing file: {0}",
+    "arguments": 1
+  },
+  {
+    "id": 100,
+    "it": "[WARN] Riga 'hosts:' assente. Procedendo con l'aggiunta/sostituzione.",
+    "en": "[WARN] The 'hosts:' line is missing. Adding/replacing it.",
+    "arguments": 0
+  },
+  {
+    "id": 101,
+    "it": "[INFO] Nsswitch già corretto. Nessuna modifica necessaria.",
+    "en": "[INFO] Nsswitch is already correct. No changes needed.",
+    "arguments": 0
+  },
+  {
+    "id": 102,
+    "it": "[INFO] Nsswitch non è corretto. Sostituendola con la nuova riga.",
+    "en": "[INFO] Nsswitch is incorrect. Replacing it with the new line.",
+    "arguments": 0
+  },
+  {
+    "id": 103,
+    "it": "[INFO] Backup creato correttamente: {0}",
+    "en": "[INFO] Backup created successfully: {0}",
+    "arguments": 1
+  },
+  {
+    "id": 104,
+    "it": "[ERROR] Impossibile creare il backup. Aborto per sicurezza.",
+    "en": "[ERROR] Cannot create the backup. Aborting for safety.",
+    "arguments": 0
+  },
+  {
+    "id": 105,
+    "it": "[ERROR] L'aggiornamento è fallito. Il backup è disponibile in {0}.",
+    "en": "[ERROR] Update failed. The backup is available in {0}.",
+    "arguments": 1
+  },
+  {
+    "id": 106,
+    "it": "[ERROR] Aggiornamento fallito. Ripristino manuale consigliato.",
+    "en": "[ERROR] Update failed. Manual restoration is recommended.",
+    "arguments": 0
+  },
+  {
+    "id": 107,
+    "it": "[INFO] Configurazione Nsswitch aggiornato e verificato.",
+    "en": "[INFO] Nsswitch configuration updated and verified.",
+    "arguments": 0
+  },
+  {
+    "id": 108,
+    "it": "[ERROR] Variabile CONFIG_FILES non definita!",
+    "en": "[ERROR] CONFIG_FILES is not defined!",
+    "arguments": 0
+  },
+  {
+    "id": 109,
+    "it": "[INFO] Avvio hostapd con config: {0}",
+    "en": "[INFO] Starting hostapd with configuration: {0}",
+    "arguments": 1
+  },
+  {
+    "id": 110,
+    "it": "[INFO] Hostapd partito e risponde (PID {0}).",
+    "en": "[INFO] Hostapd started and is responding (PID {0}).",
+    "arguments": 1
+  },
+  {
+    "id": 111,
+    "it": "[ERROR] Hostapd non pronto (exit code: {0})",
+    "en": "[ERROR] Hostapd is not ready (exit code: {0})",
+    "arguments": 1
+  },
+  {
+    "id": 112,
+    "it": "[HOSTAPD] {0}",
+    "en": "[HOSTAPD] {0}",
+    "arguments": 1
+  },
+  {
+    "id": 113,
+    "it": "Tutti i pacchetti richiesti sono già installati.",
+    "en": "All required packages are already installed.",
+    "arguments": 0
+  },
+  {
+    "id": 114,
+    "it": "Installo pacchetti mancanti: {0}",
+    "en": "Installing missing packages: {0}",
+    "arguments": 1
+  },
+  {
+    "id": 115,
+    "it": "  ✔ Pacchetti installati.",
+    "en": "  ✔ Packages installed.",
+    "arguments": 0
+  },
+  {
+    "id": 116,
+    "it": "  ✖ ERRORE: installazione pacchetti fallita. Continuo ma alcune funzioni potrebbero fallire.",
+    "en": "  ✖ ERROR: package installation failed. Continuing, but some features may fail.",
+    "arguments": 0
+  },
+  {
+    "id": 117,
+    "it": "MAC WiFi non disponibili → rimando al prossimo boot",
+    "en": "Wi-Fi MAC addresses are unavailable → retrying at the next boot",
+    "arguments": 0
+  },
+  {
+    "id": 118,
+    "it": "{0} già configurato: mantengo il valore esistente.",
+    "en": "{0} is already configured: keeping its current value.",
+    "arguments": 1
+  },
+  {
+    "id": 119,
+    "it": "IRQ {0} ({1}) -> mask {2}",
+    "en": "IRQ {0} ({1}) -> mask {2}",
+    "arguments": 3
+  },
+  {
+    "id": 120,
+    "it": "napi pid {0} -> CPU1",
+    "en": "napi pid {0} -> CPU1",
+    "arguments": 1
+  },
+  {
+    "id": 121,
+    "it": "  ✔ irq-pin.sh v1 installato/aggiornato.",
+    "en": "  ✔ irq-pin.sh v1 installed/updated.",
+    "arguments": 0
+  },
+  {
+    "id": 122,
+    "it": "irq-pin.sh v1 già presente, salto.",
+    "en": "irq-pin.sh v1 is already present; skipping it.",
+    "arguments": 0
+  },
+  {
+    "id": 123,
+    "it": "  ✔ Servizio irq-affinity creato/aggiornato (UNIT_VERSION=1).",
+    "en": "  ✔ irq-affinity service created/updated (UNIT_VERSION=1).",
+    "arguments": 0
+  },
+  {
+    "id": 124,
+    "it": "  ✔ irq-affinity applicato.",
+    "en": "  ✔ irq-affinity applied.",
+    "arguments": 0
+  },
+  {
+    "id": 125,
+    "it": "Configurazione Avahi su {0} per interfacce: {1}",
+    "en": "Configuring Avahi on {0} for interfaces: {1}",
+    "arguments": 2
+  },
+  {
+    "id": 126,
+    "it": "ERRORE: impossibile installare avahi-daemon",
+    "en": "ERROR: cannot install avahi-daemon",
+    "arguments": 0
+  },
+  {
+    "id": 127,
+    "it": "ERRORE: {0} non trovato",
+    "en": "ERROR: {0} not found",
+    "arguments": 1
+  },
+  {
+    "id": 128,
+    "it": "Configurazione scritta. Riavvio avahi-daemon...",
+    "en": "Configuration written. Restarting avahi-daemon...",
+    "arguments": 0
+  },
+  {
+    "id": 129,
+    "it": "Configurazione completata su {0}",
+    "en": "Configuration completed on {0}",
+    "arguments": 1
+  },
+  {
+    "id": 130,
+    "it": "WARN: avahi-daemon restart fallito su {0}",
+    "en": "WARN: avahi-daemon restart failed on {0}",
+    "arguments": 1
+  },
+  {
+    "id": 131,
+    "it": "Configuro Avahi reflector su {0} (interfacce: {1})...",
+    "en": "Configuring Avahi reflector on {0} (interfaces: {1})...",
+    "arguments": 2
+  },
+  {
+    "id": 132,
+    "it": "  ✔ Configurazione riuscita su localhost.",
+    "en": "  ✔ Configuration succeeded on localhost.",
+    "arguments": 0
+  },
+  {
+    "id": 133,
+    "it": "  ✖ WARN: configurazione fallita su localhost.",
+    "en": "  ✖ WARN: configuration failed on localhost.",
+    "arguments": 0
+  },
+  {
+    "id": 134,
+    "it": "Reboot necessario per applicare le modifiche al kernel.",
+    "en": "A reboot is required to apply the kernel changes.",
+    "arguments": 0
+  },
+  {
+    "id": 135,
+    "it": "Fallimento consecutivo {0}: {1}",
+    "en": "Consecutive failure {0}: {1}",
+    "arguments": 2
+  },
+  {
+    "id": 136,
+    "it": "rotte LAN",
+    "en": "LAN routes",
+    "arguments": 0
+  },
+  {
+    "id": 137,
+    "it": "DASHBOARD_PASSWORD mancante",
+    "en": "DASHBOARD_PASSWORD is missing",
+    "arguments": 0
+  },
+  {
+    "id": 138,
+    "it": "PIHOLE_PASSWORD mancante",
+    "en": "PIHOLE_PASSWORD is missing",
+    "arguments": 0
+  },
+  {
+    "id": 139,
+    "it": "Web asset mancante: {0}",
+    "en": "Missing web asset: {0}",
+    "arguments": 1
+  }
+]

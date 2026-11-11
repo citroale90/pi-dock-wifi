@@ -1,0 +1,8 @@
+{
+  "role": "ethernet",
+  "interface": "eth0",
+  "connection_uuid": "CHANGE_ME_CONNECTION_UUID",
+  "expected_network": "192.0.2.0/24",
+  "expected_gateway": "192.0.2.1",
+  "boot_grace_seconds": 120
+}

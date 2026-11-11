@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+const originalFetch = window.fetch.bind(window);
+let dashboardRedirecting = false;
+function dashboardLogin() {
+  if (dashboardRedirecting) return;
+  dashboardRedirecting = true;
+  const terminal = document.getElementById('customIframe');
+  if (terminal) terminal.remove();
+  window.location.replace('/login.html');
+}
+window.fetch = async function(input, options) {
+  const url = new URL(typeof input === 'string' ? input : input.url, location.href);
+  if (url.origin === location.origin) {
+    options = Object.assign({}, options);
+    options.headers = new Headers(options.headers || (input.headers || {}));
+    options.headers.set('X-Dashboard-Request', '1');
+  }
+  const response = await originalFetch(input, options);
+  if (url.origin === location.origin && response.status === 401) dashboardLogin();
+  return response;
+};
+async function logoutDashboard() {
+  const response = await fetch('/auth/logout', {method:'POST'});
+  await response.text();
+  dashboardLogin();
+}
+</script>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pi-Dock-Wifi Router Status</title>
+  <script>
+  (function(){
+    // Solo se siamo su un IP numerico | IT/EN: Only when the current hostname is a numeric IP address
+    if(!/^(\d+\.){3}\d+$/.test(window.location.hostname)) return;
+    
+    // Se abbiamo già testato in questa sessione, non riprovare | IT/EN: Do not retry if this session has already checked
+    try {
+      if(sessionStorage.getItem('pi-mdns-failed')) return;
+    } catch(e){}
+    
+    // Testa se pi-dock-wifi.local è raggiungibile prima di fare redirect | IT/EN: Check pi-dock-wifi.local before redirecting
+    var testUrl = 'http://pi-dock-wifi.local:' + window.location.port + '/cgi-bin/stats.sh';
+    var ctrl = new AbortController();
+    var timer = setTimeout(function(){ ctrl.abort(); }, 3000);
+    
+    fetch(testUrl, { signal: ctrl.signal, mode: 'no-cors' })
+      .then(function(){
+        clearTimeout(timer);
+        window.location.replace('http://pi-dock-wifi.local:' + window.location.port + window.location.pathname);
+      })
+      .catch(function(){
+        clearTimeout(timer);
+        try { sessionStorage.setItem('pi-mdns-failed','1'); } catch(e){}
+        // Resta sull'IP — nessun redirect | IT/EN: Stay on the IP address without redirecting
+      });
+  })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#eef1f5;--bg-card:#ffffff;--bg-card-hover:#f8fafc;--text:#1a2332;--text-muted:#5a6a7e;
+      --border:#d8dee6;--accent:#0a6e8a;--accent-light:#e6f4f8;--accent-glow:rgba(10,110,138,0.15);
+      --danger:#d94452;--success:#2a9d6e;--warning:#e0a030;
+      --shadow-sm:0 1px 3px rgba(0,0,0,0.06);--shadow-md:0 4px 12px rgba(0,0,0,0.08);
+      --radius:10px;--font:'IBM Plex Sans',-apple-system,sans-serif;--font-mono:'IBM Plex Mono','Consolas',monospace;
+      --transition:0.25s cubic-bezier(0.4,0,0.2,1);
+    }
+    [data-theme="dark"] {
+      --bg:#0f1419;--bg-card:#1a2332;--bg-card-hover:#1f2b3d;--text:#e2e8f0;--text-muted:#8899aa;
+      --border:#2a3a4e;--accent:#38bdf8;--accent-light:#0c2a3a;--accent-glow:rgba(56,189,248,0.12);
+      --shadow-sm:0 1px 3px rgba(0,0,0,0.2);--shadow-md:0 4px 12px rgba(0,0,0,0.3);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{overflow-x:hidden}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);transition:background var(--transition),color var(--transition);line-height:1.5}
+
+    /* HEADER 
+ IT/EN: INTESTAZIONE
+*/
+    .header{background:var(--bg-card);border-bottom:1px solid var(--border);padding:9px 14px;position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:nowrap}
+    .header-title{font-size:1em;font-weight:600;color:var(--accent);display:flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0}
+    .header-title svg{width:18px;height:18px}
+    .header-right{display:flex;align-items:center;gap:7px;flex-shrink:1;min-width:0}
+    .status-dot{width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 5px var(--success);flex-shrink:0}
+    .status-dot.error{background:var(--danger);box-shadow:0 0 5px var(--danger)}
+    .pause-badge{display:none;align-items:center;gap:3px;background:var(--warning);color:#fff;font-size:0.65em;font-weight:600;padding:2px 7px;border-radius:10px;animation:pulse 1.5s ease-in-out infinite}
+    .pause-badge.visible{display:inline-flex}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+    .notif-wrap{position:relative}
+    .notif-btn{background:none;border:none;cursor:pointer;color:var(--text-muted);padding:2px}
+    .notif-btn svg{width:17px;height:17px}
+    .notif-badge{position:absolute;top:-3px;right:-5px;background:var(--danger);color:#fff;font-size:.5em;font-weight:700;min-width:13px;height:13px;border-radius:7px;display:none;align-items:center;justify-content:center;padding:0 2px}
+    .notif-badge.visible{display:flex}
+    .notif-dropdown{display:none;position:absolute;top:100%;right:0;width:300px;max-height:360px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-md);overflow-y:auto;z-index:200;margin-top:5px}
+    .notif-dropdown.open{display:block}
+    .notif-dropdown-header{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-bottom:1px solid var(--border);font-size:.78em;font-weight:600;color:var(--text-muted)}
+    .notif-clear{background:none;border:none;color:var(--accent);cursor:pointer;font-size:.78em}
+    .notif-item{padding:7px 10px;border-bottom:1px solid var(--border);font-size:.78em;display:flex;gap:7px;align-items:flex-start}
+    .notif-item:last-child{border-bottom:none}
+    .ni{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px}
+    .ni.info{background:var(--accent)}.ni.warn{background:var(--warning)}.ni.error{background:var(--danger)}.ni.success{background:var(--success)}
+    .notif-empty{padding:14px;text-align:center;color:var(--text-muted);font-size:.8em}
+    #headerClock{font-family:var(--font-mono);font-size:.72em;color:var(--text-muted);white-space:nowrap}
+    .theme-toggle{width:36px;height:20px;background:var(--border);border-radius:10px;border:none;cursor:pointer;position:relative;flex-shrink:0}
+    .theme-toggle::after{content:'';position:absolute;width:16px;height:16px;background:var(--bg-card);border-radius:50%;top:2px;left:2px;transition:transform var(--transition);box-shadow:0 1px 2px rgba(0,0,0,.2)}
+    [data-theme="dark"] .theme-toggle{background:var(--accent)}
+    [data-theme="dark"] .theme-toggle::after{transform:translateX(16px)}
+    @media(max-width:500px){
+      .header{padding:7px 10px}
+      .header-title{font-size:.88em}
+      #headerClock{font-size:.65em}
+    }
+
+    /* MAIN 
+ IT/EN: SEZIONE PRINCIPALE
+*/
+    .main-content{padding:14px;max-width:1200px;margin:0 auto}
+    @media(max-width:768px){.main-content{padding:10px}}
+
+    /* FASTFETCH 
+ IT/EN: FASTFETCH
+*/
+    .fastfetch-box{width:100%;overflow:hidden;background:var(--bg)}
+    .fastfetch-iframe{width:100%;border:none;display:block;background:transparent;height:540px}
+    @media(max-width:800px){.fastfetch-iframe{height:420px}}
+    @media(max-width:500px){.fastfetch-iframe{height:auto;min-height:220px}}
+
+    /* STAT CARDS 
+ IT/EN: SCHEDE STATISTICHE
+*/
+    .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}
+    .stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:11px;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:75px}
+    .stat-label{font-size:.68em;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted);margin-bottom:2px}
+    .stat-value{font-size:1.35em;font-weight:600;font-family:var(--font-mono);color:var(--text);line-height:1.2}
+    .stat-value.compact{font-size:.9em}.stat-value.warn{color:var(--warning)}.stat-value.danger{color:var(--danger)}.stat-value.ok{color:var(--success)}
+    @media(max-width:768px){.stat-grid{grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}.stat-card{padding:8px;min-height:60px}.stat-value{font-size:1.15em}.stat-value.compact{font-size:.82em}}
+
+    /* SECTIONS 
+ IT/EN: SEZIONI
+*/
+    .section{margin-top:20px}
+    .section-title{font-size:.92em;font-weight:600;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+    .section-title svg{width:16px;height:16px;color:var(--accent)}
+
+    /* SEARCH 
+ IT/EN: RICERCA
+*/
+    .search-wrap{position:relative;margin-bottom:10px}
+    .search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--text-muted)}
+    #searchInput{width:100%;padding:8px 10px 8px 32px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-card);color:var(--text);font-family:var(--font);font-size:.88em;outline:none}
+    #searchInput:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+
+    /* TABLE 
+ IT/EN: TABELLA
+*/
+    .interface-block{margin-top:12px}
+    .interface-header{font-size:.8em;font-weight:600;color:var(--accent);background:var(--accent-light);padding:6px 10px;border-radius:var(--radius) var(--radius) 0 0;border:1px solid var(--border);border-bottom:none;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .iface-tag{background:var(--accent);color:#fff;padding:2px 6px;border-radius:4px;font-family:var(--font-mono);font-size:.85em}
+    table{width:100%;border-collapse:collapse;background:var(--bg-card);border:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius);overflow:hidden;table-layout:fixed}
+    th{padding:6px 7px;text-align:left;font-size:.7em;font-weight:600;text-transform:uppercase;color:var(--text-muted);background:var(--bg);border-bottom:1px solid var(--border)}
+    td{padding:6px 7px;font-size:.8em;border-bottom:1px solid var(--border);font-family:var(--font-mono);overflow:hidden;text-overflow:ellipsis;word-break:break-all}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:var(--bg-card-hover)}
+    .rssi-bar{display:inline-flex;align-items:flex-end;gap:2px;height:13px;vertical-align:middle;margin-right:3px}
+    .rssi-bar span{width:3px;background:var(--border);border-radius:1px}
+    .rssi-bar span:nth-child(1){height:4px}.rssi-bar span:nth-child(2){height:7px}.rssi-bar span:nth-child(3){height:10px}.rssi-bar span:nth-child(4){height:13px}
+    .rssi-bar.excellent span{background:var(--success)}.rssi-bar.good span:nth-child(-n+3){background:var(--success)}.rssi-bar.fair span:nth-child(-n+2){background:var(--warning)}.rssi-bar.weak span:nth-child(1){background:var(--danger)}
+    @media(max-width:768px){td,th{padding:4px 3px;font-size:.6em}}
+
+    /* TOAST 
+ IT/EN: NOTIFICA TEMPORANEA
+*/
+    .copy-toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--text);color:var(--bg-card);padding:6px 14px;border-radius:7px;font-size:.8em;font-weight:500;opacity:0;pointer-events:none;transition:all .3s ease;z-index:9999}
+    .copy-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* PI-HOLE 
+ IT/EN: PI-HOLE
+*/
+    .pihole-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:9px;margin-bottom:12px}
+    .pihole-stat{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center}
+    .ph-value{font-size:1.2em;font-weight:600;font-family:var(--font-mono);color:var(--accent)}
+    .ph-label{font-size:.68em;text-transform:uppercase;color:var(--text-muted);margin-top:2px}
+    .pihole-top-list{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+    .pihole-top-item{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-bottom:1px solid var(--border);font-size:.78em}
+    .pihole-top-item:last-child{border-bottom:none}
+    .pihole-top-item .domain{font-family:var(--font-mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%}
+    .pihole-top-item .count{font-family:var(--font-mono);color:var(--text-muted)}
+    .pihole-offline{text-align:center;padding:14px;color:var(--text-muted);font-size:.85em}
+
+
+    /* Associazione WPS 
+ IT/EN: WPS pairing
+*/
+    .wps-body{padding:10px}
+    .wps-status{font-size:.82em;color:var(--text-muted);margin:0 0 10px;min-height:2.5em}
+    .wps-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .wps-actions button:disabled{opacity:.5;cursor:default}
+
+    /* HOSTAPD 
+ IT/EN: HOSTAPD
+*/
+    .hostapd-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .hostapd-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+    .hostapd-card-header{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;background:var(--accent-light);border-bottom:1px solid var(--border)}
+    .ssid-label{font-size:.8em;color:var(--text-muted)}
+    .hostapd-info-grid{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;padding:10px;font-size:.83em}
+    .hostapd-info-grid .label{color:var(--text-muted);font-weight:500}.hostapd-info-grid .val{font-family:var(--font-mono)}
+    .btn-sm{padding:5px 9px;border-radius:5px;border:1px solid var(--border);background:var(--bg-card);color:var(--text);cursor:pointer;font-size:.78em;font-weight:500;transition:all var(--transition)}
+    .btn-sm:hover{background:var(--accent-light);border-color:var(--accent);color:var(--accent)}
+    .btn-sm.danger{border-color:var(--danger);color:var(--danger)}.btn-sm.danger:hover{background:var(--danger);color:#fff}
+    .deny-section{padding:8px 10px 10px;border-top:1px solid var(--border)}
+    .deny-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+    .deny-header h5{font-size:.72em;text-transform:uppercase;color:var(--text-muted);margin:0}
+    .deny-toggle{display:flex;align-items:center;gap:4px;font-size:.72em;color:var(--text-muted);cursor:pointer}
+    .deny-item{display:flex;align-items:center;justify-content:space-between;padding:3px 6px;font-family:var(--font-mono);font-size:.78em;background:var(--bg);border-radius:3px;margin-bottom:2px}
+    .deny-remove{background:none;border:none;color:var(--danger);cursor:pointer;font-size:1em;padding:1px 4px}
+    .deny-empty{font-size:.78em;color:var(--text-muted);font-style:italic}
+    .deny-add-row{display:flex;gap:4px;margin-top:5px}
+    .deny-add-input{flex:1;padding:4px 7px;border:1px solid var(--border);border-radius:5px;background:var(--bg);color:var(--text);font-family:var(--font-mono);font-size:.78em;outline:none}
+    .restart-container-bar{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:7px 10px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+    .restart-container-bar span{font-size:.8em;color:var(--text-muted)}
+    @media(max-width:768px){.hostapd-grid{grid-template-columns:1fr}.notif-dropdown{position:fixed!important;left:50%!important;top:58px!important;transform:translateX(-50%)!important;width:92%!important;max-width:340px!important;right:auto!important;margin-top:0!important;z-index:1000!important}.header{overflow:visible!important}}
+
+    /* CHART 
+ IT/EN: GRAFICO
+*/
+    .chart-container{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;min-width:0}
+    .chart-frame{position:relative;height:240px}
+    .chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+    .chart-heading{font-size:.85em;font-weight:600;margin-bottom:10px}
+    .chart-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+    .chart-tools label,.chart-note{font-size:.78em;color:var(--text-muted)}
+    .chart-tools select{padding:5px 8px;background:var(--bg-card);color:var(--text);border:1px solid var(--border);border-radius:5px;font:inherit}
+    .chart-note{margin-top:10px;line-height:1.5}
+    @media(max-width:768px){.chart-grid{grid-template-columns:1fr}.chart-frame{height:210px}}
+
+    /* LOG 
+ IT/EN: LOG
+*/
+    .log-box{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+    .log-header{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--bg);border-bottom:1px solid var(--border)}
+    .log-header span{font-size:.72em;font-weight:500;text-transform:uppercase;color:var(--text-muted)}
+    #logOutput{padding:10px;font-family:var(--font-mono);font-size:1.1em;line-height:1.5;height:380px;overflow-y:auto;color:var(--text);white-space:pre-wrap;word-break:break-all}
+
+    /* SHELL 
+ IT/EN: TERMINALE
+*/
+    .shell-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:var(--radius);font-family:var(--font);font-size:.85em;font-weight:500;cursor:pointer;transition:all var(--transition);text-decoration:none;border:none}
+    .shell-btn svg{width:14px;height:14px}
+    .shell-btn.primary{background:var(--accent);color:#fff;box-shadow:var(--shadow-sm)}.shell-btn.primary:hover{filter:brightness(1.1)}
+    .iframe-wrap{display:none;margin-top:10px;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+    .iframe-wrap iframe{width:100%;height:500px;border:none;background:#000}
+    @media(max-width:768px){.iframe-wrap iframe{height:60vh;min-height:280px}}
+    /* Special keys: hidden on desktop, shown on mobile/tablet 
+ IT/EN: Tasti speciali: nascosti su desktop, visibili su telefono e tablet
+*/
+    .special-keys{display:none;flex-wrap:wrap;gap:5px;padding:8px 6px;background:var(--bg-card);border-top:1px solid var(--border)}
+    @media(max-width:1024px){.special-keys{display:flex}}
+    .sk{padding:7px 11px;min-width:40px;border:1px solid var(--border);border-radius:5px;background:var(--bg-card);color:var(--text);font-family:var(--font-mono);font-size:.78em;font-weight:600;cursor:pointer;text-align:center;user-select:none;-webkit-user-select:none;transition:all .12s;-webkit-tap-highlight-color:transparent}
+    .sk:active{background:var(--accent);color:#fff;transform:scale(.95)}
+    .sk.mod{background:var(--accent-light);color:var(--accent);border-color:var(--accent)}
+
+    .skeleton{background:linear-gradient(90deg,var(--border) 25%,var(--bg) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:4px}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
+    Pi-Dock-Wifi <span class="status-dot" id="statusDot"></span>
+  </div>
+  <div class="header-right">
+    <div class="pause-badge" id="pauseBadge"><svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Pause</div>
+    <div class="notif-wrap">
+      <button class="notif-btn" id="notifBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="notif-badge" id="notifBadge">0</span></button>
+      <div class="notif-dropdown" id="notifDropdown"><div class="notif-dropdown-header"><span>Notifications</span><button class="notif-clear" id="notifClear">Clear</button></div><div id="notifList"><div class="notif-empty">No notifications</div></div></div>
+    </div>
+    <span id="headerClock"></span>
+    <button class="theme-toggle" id="themeToggle"></button>
+    <button class="btn-sm" onclick="logoutDashboard()">Sign out</button>
+  </div>
+</div>
+
+<div class="main-content">
+  <div class="fastfetch-box"><iframe class="fastfetch-iframe" id="fastfetchIframe" src="/cgi-bin/fastfetch.sh"></iframe></div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><span class="stat-label">Uptime</span><span class="stat-value compact" id="uptime">--</span></div>
+    <div class="stat-card"><span class="stat-label">CPU</span><span class="stat-value" id="cpu"><span class="skeleton" style="display:inline-block;width:40px;height:1em">&nbsp;</span></span></div>
+    <div class="stat-card"><span class="stat-label">RAM</span><span class="stat-value" id="ram"><span class="skeleton" style="display:inline-block;width:40px;height:1em">&nbsp;</span></span></div>
+    <div class="stat-card"><span class="stat-label">Temp</span><span class="stat-value" id="temp"><span class="skeleton" style="display:inline-block;width:40px;height:1em">&nbsp;</span></span></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Connected Clients</div>
+    <div class="search-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="text" id="searchInput" placeholder="Search IP, hostname or MAC..."></div>
+    <div id="clientTables"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Hostapd Management</div>
+    <div id="hostapdRestart"></div>
+    <div class="hostapd-grid" id="hostapdPanel"><div class="hostapd-card"><div style="padding:14px;text-align:center;color:var(--text-muted)">Loading...</div></div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">WPS pairing</div>
+    <p class="wps-status">Press Start, then the device WPS button within two minutes. You can cancel at any time.</p>
+    <div class="wps-actions" style="margin-bottom:10px">
+      <button type="button" class="btn-sm" id="wpsStart" disabled>Start WPS on both bands</button>
+      <button type="button" class="btn-sm danger" id="wpsCancel" disabled>Cancel WPS</button>
+    </div>
+    <div class="hostapd-grid" id="wpsPanel">Loading...</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Pi-hole DNS</div>
+    <div id="piholeWidget"><div class="pihole-offline">Loading...</div></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>Wi-Fi Traffic</div>
+        <div class="chart-tools"><label for="chartWindow">Interval</label><select id="chartWindow"><option value="60">1 minute</option><option value="300" selected>5 minutes</option><option value="900">15 minutes</option></select><button class="btn-sm" id="chartPause" type="button" aria-pressed="false">Pause charts</button></div>
+    <div class="chart-container"><div class="chart-heading">Traffic by interface</div><div class="chart-frame"><canvas id="wifiChart" aria-label="Wi-Fi traffic in KiB per second" role="img"></canvas></div></div>
+    <div class="chart-grid"><div class="chart-container"><div class="chart-heading">CPU and memory</div><div class="chart-frame"><canvas id="systemChart" aria-label="CPU and memory usage as a percentage" role="img"></canvas></div></div><div class="chart-container"><div class="chart-heading">Temperatures</div><div class="chart-frame"><canvas id="tempChart" aria-label="System and radio temperatures" role="img"></canvas></div></div></div>
+    <div class="chart-note" id="chartNote">History is collected while this page is open. RX = received by the AP; TX = sent by the AP. Radio temperatures appear when available.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>System Log</div>
+    <div class="log-box"><div class="log-header"><span>Output</span></div><div id="logOutput">Loading...</div></div>
+  </div>
+
+  <div class="section">
+    <button class="shell-btn primary" id="toggleIframeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>Router Shell</button>
+    <div class="iframe-wrap" id="iframeContainer">
+      <iframe id="customIframe" allow="fullscreen"></iframe>
+      <div class="special-keys" id="specialKeys">
+        <button class="sk mod" data-seq="\x03" title="Ctrl+C">Ctrl+C</button>
+        <button class="sk mod" data-seq="\x04" title="Ctrl+D">Ctrl+D</button>
+        <button class="sk mod" data-seq="\x12" title="Ctrl+R">Ctrl+R</button>
+        <button class="sk mod" data-seq="\x0c" title="Ctrl+L">Ctrl+L</button>
+        <button class="sk" data-seq="\t" title="Tab">Tab</button>
+        <button class="sk" data-seq="\x1b" title="Esc">Esc</button>
+        <button class="sk" data-seq="\x1b[A" title="Up">&#9650;</button>
+        <button class="sk" data-seq="\x1b[B" title="Down">&#9660;</button>
+        <button class="sk" data-seq="\x1b[D" title="Left">&#9664;</button>
+        <button class="sk" data-seq="\x1b[C" title="Right">&#9654;</button>
+        <button class="sk" data-seq="\x01" title="Ctrl+A">^A</button>
+        <button class="sk" data-seq="\x05" title="Ctrl+E">^E</button>
+        <button class="sk" data-seq="|" title="Pipe">|</button>
+        <button class="sk" data-seq="/" title="Slash">/</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="copy-toast" id="copyToast">Copied!</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Requests are shared per endpoint; each response body is consumed once. | IT/EN: Le richieste sono condivise per endpoint; ogni corpo di risposta viene consumato una volta sola
+var dashboardRequests=new Map();
+function dashboardRead(path,headers){
+  if(dashboardRequests.has(path))return dashboardRequests.get(path);
+  var ctrl=new AbortController(),timer=setTimeout(function(){ctrl.abort()},path.indexOf('pihole.sh')>=0?20000:8000);
+  var request=(async function(){try{var response=await fetch(path,{signal:ctrl.signal,headers:headers||{}});return{response:response,text:response.status===304?'':await response.text()}}finally{clearTimeout(timer);dashboardRequests.delete(path)}})();
+  dashboardRequests.set(path,request);return request;
+}
+function startDashboardPoll(task,interval){
+  var timer=null,running=false;
+  async function tick(){
+    clearTimeout(timer);if(running)return;
+    if(document.hidden||dashboardRedirecting){timer=setTimeout(tick,interval);return}
+    running=true;try{await task()}catch(e){}finally{running=false;timer=setTimeout(tick,interval)}
+  }
+  document.addEventListener('visibilitychange',function(){if(!document.hidden&&!running)tick()});tick();
+}
+function htmlText(value){return String(value==null?'':value).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+
+// ===== THEME ===== | IT/EN: TEMA
+var TT=document.getElementById('themeToggle'),MT=null;
+function autoT(){var h=new Date().getHours();return h>=20||h<7?'dark':'light'}
+function applyT(){document.documentElement.setAttribute('data-theme',MT||autoT())}
+applyT();
+TT.onclick=function(){var cur=document.documentElement.getAttribute('data-theme');MT=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',MT)};
+function uClock(){var n=new Date(),d=['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];document.getElementById('headerClock').textContent=d[n.getDay()]+' '+String(n.getDate()).padStart(2,'0')+'/'+String(n.getMonth()+1).padStart(2,'0')+' '+String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0')}
+uClock();setInterval(uClock,1000);setInterval(function(){if(!MT)applyT()},60000);
+
+// ===== FASTFETCH AUTO-HEIGHT ===== | IT/EN: ALTEZZA AUTOMATICA FASTFETCH
+window.addEventListener('message',function(e){if(e.data&&e.data.type==='fastfetch-height'&&e.data.height){document.getElementById('fastfetchIframe').style.height=Math.ceil(e.data.height)+'px'}});
+
+// ===== NOTIFICATIONS ===== | IT/EN: NOTIFICHE
+var notifs=[],MN=50,prevMacs=new Set(),fLoad=true;
+function addN(t,m){notifs.unshift({type:t,message:m,time:new Date()});if(notifs.length>MN)notifs.pop();rN()}
+function rN(){var b=document.getElementById('notifBadge'),l=document.getElementById('notifList');b.textContent=notifs.length;notifs.length?b.classList.add('visible'):b.classList.remove('visible');if(!notifs.length){l.innerHTML="<div class=\"notif-empty\">No notifications</div>";return}l.innerHTML=notifs.map(function(n){return'<div class="notif-item"><div class="ni '+n.type+'"></div><div style="flex:1">'+htmlText(n.message)+'<div style="font-size:.7em;color:var(--text-muted);margin-top:1px">'+n.time.toLocaleTimeString()+'</div></div></div>'}).join('')}
+document.getElementById('notifBtn').onclick=function(e){e.stopPropagation();document.getElementById('notifDropdown').classList.toggle('open')};
+document.addEventListener('click',function(){document.getElementById('notifDropdown').classList.remove('open')});
+document.getElementById('notifDropdown').onclick=function(e){e.stopPropagation()};
+document.getElementById('notifClear').onclick=function(){notifs=[];rN()};rN();
+
+// ===== PAUSE ===== | IT/EN: PAUSA
+var rP=false,pT=null;
+document.addEventListener('selectionchange',function(){var s=window.getSelection();if(s&&s.toString().trim().length>0){rP=true;document.getElementById('pauseBadge').classList.add('visible');clearTimeout(pT);pT=setTimeout(function(){rP=false;document.getElementById('pauseBadge').classList.remove('visible')},30000)}else{clearTimeout(pT);pT=setTimeout(function(){rP=false;document.getElementById('pauseBadge').classList.remove('visible')},2000)}});
+
+// ===== COPY ===== | IT/EN: COPIA
+function showToast(t){var e=document.getElementById('copyToast');e.textContent="Copied: "+t;e.classList.add('show');setTimeout(function(){e.classList.remove('show')},1500)}
+document.getElementById('clientTables').addEventListener('dblclick',function(e){var td=e.target.closest('td');if(!td)return;var copy=td.querySelector('[data-copy]'),t=copy?copy.dataset.copy:td.textContent.trim();if(t&&t!=='*'){navigator.clipboard.writeText(t).then(function(){showToast(t)});var r=document.createRange();r.selectNodeContents(td);var s=window.getSelection();s.removeAllRanges();s.addRange(r)}});
+
+// ===== CHART ===== | IT/EN: GRAFICO
+var isDk=function(){return document.documentElement.getAttribute('data-theme')==='dark'};
+var chartWindow=300000,chartPaused=false,chartStamp=0,iP={},allC=[],lWD={};
+function cOpts(unit,max){
+  var c=isDk()?'#cbd5e1':'#475569',g=isDk()?'rgba(255,255,255,.06)':'rgba(0,0,0,.06)';
+  return{responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'bottom',labels:{color:c,usePointStyle:true,boxWidth:8,font:{size:11}}},tooltip:{callbacks:{title:function(items){return items.length?new Date(items[0].parsed.x).toLocaleTimeString("en-GB"):''},label:function(item){return item.dataset.label+': '+Number(item.parsed.y).toLocaleString("en-GB",{maximumFractionDigits:1})+' '+unit}}}},scales:{x:{type:'linear',ticks:{color:c,maxTicksLimit:6,font:{size:10},callback:function(value){return new Date(value).toLocaleTimeString("en-GB",{hour:'2-digit',minute:'2-digit',second:'2-digit'})}},grid:{display:false}},y:{beginAtZero:true,max:max,title:{display:true,text:unit,color:c,font:{size:11}},ticks:{color:c,font:{size:10}},grid:{color:g}}}};
+}
+function makeChart(id,unit,max){return new Chart(document.getElementById(id),{type:'line',data:{labels:[],datasets:[]},options:cOpts(unit,max)})}
+var wC=makeChart('wifiChart','KiB/s'),sC=makeChart('systemChart','%',100),tC=makeChart('tempChart','°C');
+var chartList=[wC,sC,tC];
+function chartSeries(ch,label,color,dashed){
+  var ds=ch.data.datasets.find(function(d){return d.label===label});
+  if(!ds){ds={label:label,data:ch.data.datasets.length?ch.data.datasets[0].data.map(function(p){return{x:p.x,y:null}}):[],borderColor:color,backgroundColor:color,borderDash:dashed?[5,4]:[],borderWidth:2,pointRadius:0,pointHoverRadius:4,tension:0,spanGaps:false,fill:false};ch.data.datasets.push(ds)}return ds;
+}
+function chartNumber(value){if(value==null||value===''||value==='null')return null;var n=Number(value);return Number.isFinite(n)?n:null}
+function chartAppend(ch,values,stamp){
+  ch.data.datasets.forEach(function(ds){ds.data.push({x:stamp,y:Object.prototype.hasOwnProperty.call(values,ds.label)?values[ds.label]:null});while(ds.data.length>310||ds.data.length>1&&ds.data[0].x<stamp-900000)ds.data.shift()});
+}
+function redrawCharts(){chartList.forEach(function(ch){if(chartStamp){ch.options.scales.x.min=chartStamp-chartWindow;ch.options.scales.x.max=chartStamp}ch.update('none')})}
+function uChart(ch,wifi,stamp){
+  var now=performance.now(),cols=['#087fa1','#9b5ce5','#d08a15'],values={};stamp=stamp||Date.now();
+  Object.keys(iP).forEach(function(iface){if(!wifi||!wifi[iface])delete iP[iface]});
+  Object.keys(wifi||{}).forEach(function(iface,index){
+    var rx=chartNumber(wifi[iface].rx),tx=chartNumber(wifi[iface].tx),previous=iP[iface],elapsed=previous?(now-previous.time)/1000:0;
+    var rates=[null,null];
+    if(rx!=null&&tx!=null&&rx>=0&&tx>=0){
+      if(previous&&elapsed>0&&elapsed<=15){rates=[rx>=previous.rx?(rx-previous.rx)/1024/elapsed:null,tx>=previous.tx?(tx-previous.tx)/1024/elapsed:null]}
+      iP[iface]={rx:rx,tx:tx,time:now};
+    }else{delete iP[iface]}
+    [' RX',' TX'].forEach(function(suffix,i){var label=iface+suffix;chartSeries(ch,label,cols[index%cols.length],i===1);values[label]=rates[i]==null?null:Number(rates[i].toFixed(2))});
+  });
+  chartAppend(ch,values,stamp);
+}
+function updateCharts(d){
+  if(chartPaused){iP={};return}var stamp=Date.now();if(chartStamp&&stamp-chartStamp>15000){chartList.forEach(function(ch){chartAppend(ch,{},chartStamp+3000);chartAppend(ch,{},stamp-1)})}chartStamp=stamp;uChart(wC,d.wifi,stamp);
+  chartSeries(sC,'CPU','#087fa1');chartSeries(sC,'RAM','#9b5ce5');
+  chartAppend(sC,{CPU:chartNumber(d.cpu),RAM:chartNumber(d.ram)},stamp);
+  var temps={Sistema:chartNumber(d.temp)};chartSeries(tC,"System",'#de6c45');
+  Object.keys(d.wifi||{}).forEach(function(iface,index){var value=chartNumber(d.wifi[iface].temp);if(value!=null||tC.data.datasets.some(function(ds){return ds.label===iface})){chartSeries(tC,iface,['#087fa1','#9b5ce5','#d08a15'][index%3]);temps[iface]=value}});
+  chartAppend(tC,temps,stamp);redrawCharts();
+}
+document.getElementById('chartWindow').addEventListener('change',function(e){var value=Number(e.target.value);if([60,300,900].indexOf(value)>=0){chartWindow=value*1000;redrawCharts()}});
+document.getElementById('chartPause').addEventListener('click',function(){chartPaused=!chartPaused;iP={};this.textContent=chartPaused?"Resume charts":"Pause charts";this.setAttribute('aria-pressed',String(chartPaused))});
+new MutationObserver(function(){wC.options=cOpts('KiB/s');sC.options=cOpts('%',100);tC.options=cOpts('°C');redrawCharts()}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+// ===== RSSI ===== | IT/EN: RSSI
+function rC(r){return r>=-50?'excellent':r>=-60?'good':r>=-70?'fair':'weak'}
+function rB(r){r=Number(r);if(!Number.isFinite(r)||r<=-999)return'';return'<span class="rssi-bar '+rC(r)+'"><span></span><span></span><span></span><span></span></span>'+r+' dBm'}
+function bL(i){return i==='wlan0'?' (2.4GHz)':i==='wlan1'?' (5GHz)':''}
+
+// ===== CLIENT TABLE ===== | IT/EN: TABELLA CLIENT
+// A configured reservation is useful immediately, but is not a lease confirmation. | IT/EN: Una prenotazione configurata è subito utile, ma non conferma un lease
+function clientIpLabel(client){
+  if(!client.ip)return "<span title=\"The client is connected to Wi-Fi; the router does not yet know a verifiable IP address\">Waiting for IP</span>";
+  var titles={lease:"Valid DHCP lease",neighbor:"Address found in the local network table",reservation:"Reserved IP: use not yet confirmed"};
+  return '<span data-copy="'+htmlText(client.ip)+'" title="'+htmlText(titles[client.ip_source]||"Local address")+'">'+htmlText(client.ip)+(client.ip_source==='reservation'?" · reserved":'')+'</span>';
+}
+function rCT(clients,wd){if(wd)lWD=wd;var c=document.getElementById('clientTables'),q=document.getElementById('searchInput').value.toLowerCase();var f=clients.filter(function(x){return(x.ip||'').toLowerCase().indexOf(q)!==-1||(x.hostname||'').toLowerCase().indexOf(q)!==-1||(x.mac||'').toLowerCase().indexOf(q)!==-1});var g={};f.forEach(function(x){if(!g[x.iface])g[x.iface]=[];g[x.iface].push(x)});if(!f.length){delete c.dataset.lh;c.innerHTML="<p style=\"text-align:center;color:var(--text-muted);padding:14px\">No clients</p>";return}var h='';for(var i in g){var e=g[i],info=lWD[i]?lWD[i].info:null,ssid=info&&info.ssid||'n/d',cc=info&&info.client_count!==undefined?info.client_count:'n/d',tmp=lWD[i]?lWD[i].temp:null,ts=tmp!=null&&tmp!=='null'?' · '+parseFloat(tmp).toFixed(1)+'°C':'';h+='<div class="interface-block"><div class="interface-header"><span class="iface-tag">'+i+bL(i)+'</span><span>SSID: '+htmlText(ssid)+'</span><span>Client: '+cc+ts+'</span></div><table><thead><tr><th>IP</th><th>Hostname</th><th>MAC</th><th>Segnale</th></tr></thead><tbody>';e.forEach(function(x){h+='<tr><td>'+clientIpLabel(x)+'</td><td>'+htmlText(x.hostname||"Name not reported")+'</td><td>'+htmlText(x.mac)+'</td><td>'+rB(x.rssi)+'</td></tr>'});h+='</tbody></table></div>'}if(c.dataset.lh!==h){var s=window.getSelection();if(!(s&&s.toString().trim().length>0&&c.contains(s.anchorNode))){c.innerHTML=h;c.dataset.lh=h}}}
+document.getElementById('searchInput').oninput=function(){rCT(allC)};
+
+// ===== STAT ===== | IT/EN: STATISTICHE
+function sV(id,v){var el=document.getElementById(id),n=parseFloat(v);if(isNaN(n)){el.textContent='--';el.className='stat-value';return}if(id==='cpu'||id==='ram'){el.textContent=n.toFixed(1)+'%';el.className='stat-value '+(n>85?'danger':n>60?'warn':'ok')}else if(id==='temp'){el.textContent=n.toFixed(1)+'°C';el.className='stat-value '+(n>75?'danger':n>60?'warn':'ok')}else{el.textContent=v;el.className='stat-value'}}
+
+// ===== MAIN REFRESH ===== | IT/EN: AGGIORNAMENTO PRINCIPALE
+var fE=0;
+async function refresh(){if(rP)return;try{var result=await dashboardRead('/cgi-bin/stats.sh'),r=result.response,t=result.text,j=t.indexOf('{');if(!r.ok)throw 0;if(j===-1)throw 0;var d=JSON.parse(t.substring(j));fE=0;document.getElementById('statusDot').classList.remove('error');document.getElementById('uptime').textContent=d.uptime||'--';sV('cpu',d.cpu);sV('ram',d.ram);sV('temp',d.temp);if(parseFloat(d.cpu)>90)addN('error','CPU '+parseFloat(d.cpu).toFixed(0)+'%');if(parseFloat(d.temp)>80)addN('error','Temp '+parseFloat(d.temp).toFixed(1)+'°C');var cl=[],cm=new Set();Object.keys(d.clients||{}).forEach(function(i){(Array.isArray(d.clients[i])?d.clients[i]:Object.values(d.clients[i]||{})).forEach(function(c){var m=c.mac||'*';cm.add(m);cl.push({ip:c.ip==="unassigned"?'':c.ip||'',hostname:c.hostname==='*'||c.hostname==="unavailable"?'':c.hostname||'',mac:m,rssi:c.rssi,iface:i,ip_source:c.ip_source||'none',ip_confirmed:c.ip_confirmed===true})})});if(!fLoad){cm.forEach(function(m){if(!prevMacs.has(m)&&m!=='*'){var x=cl.find(function(c){return c.mac===m});addN('success',"Connected: "+(x&&x.hostname?x.hostname:m))}});prevMacs.forEach(function(m){if(!cm.has(m)&&m!=='*')addN('warn',"Disconnected: "+m)})}fLoad=false;prevMacs=cm;allC=cl;rCT(cl,d.wifi);if(!hLock)rHP(d.wifi);updateCharts(d)}catch(e){fE++;if(fE>=3){document.getElementById('statusDot').classList.add('error');if(fE===3)addN('error',"Connection lost")}}}
+startDashboardPoll(refresh,2000);
+
+// ===== HOSTAPD ===== | IT/EN: HOSTAPD
+var hDL={},hDE={},hLock=false;
+document.getElementById('hostapdPanel').addEventListener('focusin',function(e){if(e.target.classList.contains('deny-add-input'))hLock=true});document.getElementById('hostapdPanel').addEventListener('focusout',function(e){if(e.target.classList.contains('deny-add-input'))hLock=false});
+function rHP(wd){var p=document.getElementById('hostapdPanel'),rd=document.getElementById('hostapdRestart');if(!wd)return;rd.innerHTML="<div class=\"restart-container-bar\"><span>Restart Wi-Fi services</span><button class=\"btn-sm danger\" onclick=\"restartC()\">&#x21bb; Restart</button></div>";var h='';for(var i in wd){var w=wd[i],hi=w.hostapd||{},info=w.info||{},de=hDE[i]||false,dl=hDL[i]||[];h+='<div class="hostapd-card"><div class="hostapd-card-header"><span class="iface-tag">'+i+bL(i)+'</span><span class="ssid-label">'+htmlText(info.ssid||'n/d')+'</span></div><div class="hostapd-info-grid"><span class="label">Ch</span><span class="val">'+htmlText(hi.channel||'-')+'</span><span class="label">BW</span><span class="val">'+htmlText(hi.width||'-')+' MHz</span><span class="label">Std</span><span class="val">'+htmlText(hi.standard||'-')+'</span><span class="label">Client</span><span class="val">'+(info.client_count!==undefined?info.client_count:'-')+'</span></div><div class="deny-section"><div class="deny-header"><h5>Deny List</h5><label class="deny-toggle"><input type="checkbox" '+(de?'checked':'')+' onchange="tgDeny(\''+i+'\','+!de+')"> On</label></div>';if(!dl.length)h+="<div class=\"deny-empty\">Empty</div>";else dl.forEach(function(m){h+='<div class="deny-item"><span>'+m+'</span><button class="deny-remove" onclick="rmDeny(\''+i+'\',\''+m+'\')">&times;</button></div>'});h+='<div class="deny-add-row"><input type="text" class="deny-add-input" id="am-'+i+'" placeholder="XX:XX:XX:XX:XX:XX"><button class="btn-sm" onclick="addDeny(\''+i+'\')">+</button></div></div></div>'}p.innerHTML=h}
+async function lDL(){try{var result=await dashboardRead('/cgi-bin/hostapd_ctl.sh'),r=result.response,t=result.text,j=t.indexOf('{');if(!r.ok)throw 0;if(j<0)return;var d=JSON.parse(t.substring(j));if(d.interfaces)for(var i in d.interfaces){hDL[i]=d.interfaces[i].deny_list||[];hDE[i]=d.interfaces[i].deny_enabled||false}}catch(e){}}
+startDashboardPoll(lDL,15000);
+async function restartC(){if(!confirm("Restart?"))return;addN('warn',"Restarting...");try{await fetch('/cgi-bin/hostapd_ctl.sh',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'action=restart_container'})}catch(e){}setTimeout(function p(){fetch('/cgi-bin/stats.sh').then(function(){addN('success',"Restarted");location.reload()}).catch(function(){setTimeout(p,3000)})},5000)}
+async function addDeny(i){var inp=document.getElementById('am-'+i),m=inp.value.trim();if(!m)return;try{var r=await fetch('/cgi-bin/hostapd_ctl.sh',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'action=add_deny&iface='+i+'&mac='+encodeURIComponent(m)});var t=await r.text(),d=JSON.parse(t.substring(t.indexOf('{')));addN(d.success?'success':'error',d.message||d.error);if(d.success){inp.value='';lDL()}}catch(e){addN('error',e.message)}}
+async function rmDeny(i,m){if(!confirm("Remove "+m+'?'))return;hLock=true;try{var r=await fetch('/cgi-bin/hostapd_ctl.sh',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'action=remove_deny&iface='+i+'&mac='+m});var t=await r.text(),d=JSON.parse(t.substring(t.indexOf('{')));addN(d.success?'success':'error',d.message||d.error);await lDL();}catch(e){addN('error',e.message)}finally{hLock=false;}}
+async function tgDeny(i,en){hLock=true;hDE[i]=en;try{var r=await fetch('/cgi-bin/hostapd_ctl.sh',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'action='+(en?'enable_deny':'disable_deny')+'&iface='+i});var t=await r.text(),d=JSON.parse(t.substring(t.indexOf('{')));addN(d.success?'info':'error',d.message||d.error);if(!d.success)hDE[i]=!en;await lDL();}catch(e){hDE[i]=!en;addN('error',e.message)}finally{hLock=false;}}
+
+// ===== WPS: solo associazione a pulsante ===== | IT/EN: WPS: push-button pairing only
+var wpsInterfaces = {};
+var wpsBusy = false;
+
+function wpsMessage(status) {
+  if (status.state === 'active') {
+    if (status.expiresAt) {
+      var seconds = Math.max(0, Math.ceil((status.expiresAt - Date.now()) / 1000));
+      return "Waiting for the device: " + seconds + ' s';
+    }
+    return "Waiting for the device (up to two minutes)";
+  }
+  if (status.reason) return status.reason;
+  if (status.last_result === 'Success') return "Last WPS pairing succeeded";
+  if (status.last_result === 'Failed') return "Last WPS attempt failed";
+  return "Ready. Pairing only opens when you press Start.";
+}
+
+function renderWps() {
+  var panel = document.getElementById('wpsPanel');
+  var fragment = document.createDocumentFragment();
+  var interfaces = Object.keys(wpsInterfaces);
+  var active = interfaces.some(function (iface) {
+    return wpsInterfaces[iface].state === 'active' || wpsInterfaces[iface].state === 'overlap';
+  });
+  document.getElementById('wpsStart').disabled = wpsBusy || active || !interfaces.length ||
+    interfaces.some(function (iface) { return !wpsInterfaces[iface].ready; });
+  document.getElementById('wpsCancel').disabled = wpsBusy || !active;
+  interfaces.forEach(function (iface, index) {
+    var status = wpsInterfaces[iface];
+    var card = document.createElement('div');
+    card.className = 'hostapd-card';
+    var header = document.createElement('div');
+    header.className = 'hostapd-card-header';
+    var label = document.createElement('span');
+    label.className = 'iface-tag';
+    label.textContent = (index === 0 ? '2,4 GHz' : '5 GHz') + ' · ' + iface;
+    var network = document.createElement('span');
+    network.className = 'ssid-label';
+    network.textContent = lWD[iface] && lWD[iface].info ? lWD[iface].info.ssid : '';
+    header.append(label, network);
+    var body = document.createElement('div');
+    body.className = 'wps-body';
+    var message = document.createElement('p');
+    message.className = 'wps-status';
+    message.dataset.wpsIface = iface;
+    message.setAttribute('role', 'status');
+    message.textContent = wpsMessage(status);
+    body.appendChild(message);
+    card.append(header, body);
+    fragment.appendChild(card);
+  });
+  panel.replaceChildren(fragment);
+}
+
+async function loadWpsStatus() {
+  if (wpsBusy) return;
+  try {
+    var result = await dashboardRead('/cgi-bin/wps.sh');
+    if (!result.response.ok) throw new Error("WPS status unavailable");
+    var data = JSON.parse(result.text);
+    if (!data.success || !data.interfaces) throw new Error("Invalid WPS response");
+    wpsInterfaces = data.interfaces;
+    Object.keys(wpsInterfaces).forEach(function (iface) {
+      var status = wpsInterfaces[iface];
+      if (status.state === 'active' && Number.isFinite(status.remaining_seconds)) {
+        status.expiresAt = Date.now() + status.remaining_seconds * 1000;
+      }
+    });
+    renderWps();
+  } catch (error) {
+    wpsInterfaces = {};
+    document.getElementById('wpsPanel').textContent = "WPS status temporarily unavailable.";
+    document.getElementById('wpsStart').disabled = true;
+    document.getElementById('wpsCancel').disabled = true;
+  }
+}
+
+async function changeWps(action) {
+  if (wpsBusy) return;
+  wpsBusy = true;
+  renderWps();
+  try {
+    var body = new URLSearchParams({action: action});
+    var response = await fetch('/cgi-bin/wps.sh', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: body.toString()
+    });
+    var result = await response.json();
+    if (!response.ok || !result.success) throw new Error(result.error || "WPS operation failed");
+    addN('info', result.message);
+  } catch (error) {
+    addN('error', error.message);
+  } finally {
+    wpsBusy = false;
+    await loadWpsStatus();
+  }
+}
+
+document.getElementById('wpsStart').addEventListener('click', function () { changeWps('start'); });
+document.getElementById('wpsCancel').addEventListener('click', function () { changeWps('cancel'); });
+startDashboardPoll(loadWpsStatus, 5000);
+setInterval(function () {
+  document.querySelectorAll('[data-wps-iface]').forEach(function (node) {
+    var status = wpsInterfaces[node.dataset.wpsIface];
+    if (status && status.state === 'active') node.textContent = wpsMessage(status);
+  });
+}, 1000);
+
+// ===== PI-HOLE ===== | IT/EN: PI-HOLE
+async function rPH(){var w=document.getElementById('piholeWidget');try{var result=await dashboardRead('/cgi-bin/pihole.sh'),r=result.response,t=result.text,j=t.indexOf('{');if(!r.ok)throw 0;if(j<0)throw 0;var d=JSON.parse(t.substring(j));if(d.status==='offline'){w.innerHTML='<div class="pihole-offline">Pi-hole offline</div>';return}var h='<div class="pihole-grid"><div class="pihole-stat"><div class="ph-value">'+(d.dns_queries_today||0).toLocaleString()+'</div><div class="ph-label">Query</div></div><div class="pihole-stat"><div class="ph-value">'+(d.ads_blocked_today||0).toLocaleString()+"</div><div class=\"ph-label\">Blocked</div></div><div class=\"pihole-stat\"><div class=\"ph-value\" style=\"color:var(--success)\">"+(d.ads_percentage_today||0).toFixed(1)+'%</div><div class="ph-label">% Block</div></div><div class="pihole-stat"><div class="ph-value">'+(d.domains_being_blocked||0).toLocaleString()+"</div><div class=\"ph-label\">Domains</div></div></div>";if(d.top_ads){h+='<div class="pihole-top-list">';Object.keys(d.top_ads).slice(0,5).forEach(function(dom){h+='<div class="pihole-top-item"><span class="domain">'+htmlText(dom)+'</span><span class="count">'+d.top_ads[dom]+'</span></div>'});h+='</div>'}w.innerHTML=h}catch(e){w.innerHTML="<div class=\"pihole-offline\">Pi-hole error</div>"}}
+startDashboardPoll(rPH,30000);
+
+// ===== LOG ===== | IT/EN: LOG
+var lC='',logEtag='';async function fLog(){if(rP)return;try{var result=await dashboardRead('/cgi-bin/readlog.sh',logEtag?{'If-None-Match':logEtag}:{}),r=result.response;if(r.status===304)return;if(!r.ok)return;logEtag=r.headers.get('ETag')||'';var t=result.text;if(t!==lC){lC=t;document.getElementById('logOutput').innerHTML='<code>'+htmlText(lC)+'</code>'}}catch(e){}}
+startDashboardPoll(fLog,2000);
+
+// ===== SHELL ===== | IT/EN: TERMINALE
+// Same-origin via nginx proxy /terminal/ | IT/EN: Stessa origine tramite proxy nginx /terminal/
+// Page always runs on pi-dock-wifi.local thanks to auto-redirect | IT/EN: La pagina usa pi-dock-wifi.local grazie al reindirizzamento automatico
+var shellOpen=false;
+document.getElementById('toggleIframeBtn').onclick=function(){
+  var c=document.getElementById('iframeContainer'),f=document.getElementById('customIframe');
+  if(!shellOpen){
+    c.style.display='block';shellOpen=true;
+    if(!f.src) f.src='/terminal/';
+    setTimeout(function(){c.scrollIntoView({behavior:'smooth',block:'start'})},100);
+  } else {
+    c.style.display='none';shellOpen=false;
+  }
+};
+
+// ===== SPECIAL KEYS (mobile only, visible via CSS media query) ===== | IT/EN: TASTI SPECIALI: solo mobile, visibili tramite media query CSS
+// xterm.js processes InputEvent on its hidden textarea. | IT/EN: xterm.js gestisce InputEvent sulla propria textarea nascosta
+function sendKeyToTerminal(seq) {
+  try {
+    var iframe = document.getElementById('customIframe');
+    var ta = iframe.contentDocument.querySelector('textarea');
+    if (!ta) { console.warn('textarea not found'); return; }
+    ta.focus();
+    ta.dispatchEvent(new InputEvent('input', {data: seq, inputType: 'insertText', bubbles: true}));
+    // Immediately refocus iframe to prevent Chrome Android from suspending WS | IT/EN: Rimetti subito il fuoco sull’iframe per evitare la sospensione WebSocket di Chrome Android
+    setTimeout(function(){ iframe.focus(); ta.focus(); }, 50);
+  } catch(e) {
+    console.warn('Special key error:', e);
+  }
+}
+
+document.getElementById('specialKeys').addEventListener('click', function(e) {
+  var btn = e.target.closest('.sk');
+  if (!btn) return;
+  e.preventDefault();
+  e.stopPropagation();
+  var seq = btn.dataset.seq;
+  if (!seq) return;
+  var unesc = seq.replace(/\\x([0-9a-fA-F]{2})/g, function(_, h) {
+    return String.fromCharCode(parseInt(h, 16));
+  }).replace(/\\t/g, '\t').replace(/\\n/g, '\n');
+  sendKeyToTerminal(unesc);
+});
+
+// Gotty has --reconnect built-in, no keep-alive needed | IT/EN: Gotty include --reconnect: non serve un keep-alive
+</script>
+</body>
+</html>

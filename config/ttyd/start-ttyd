@@ -1,0 +1,2 @@
+#!/bin/bash
+exec ttyd --interface lo --port "${PORT:-3000}" --check-origin -W bash /usr/local/bin/sshconnect

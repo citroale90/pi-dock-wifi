@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+if [[ -r /run/pi-dock-wifi/ttyd.env ]]; then
+    . /run/pi-dock-wifi/ttyd.env
+fi
+# IT: Localizza solo il testo dell’errore; autenticazione SSH invariata.
+# EN: Localize only the error text; SSH authentication is unchanged.
+case "${APP_LANGUAGE:-it}" in
+    en) pdw_ssh_required='SSH_PASSWORD is missing' ;;
+    *) pdw_ssh_required='SSH_PASSWORD mancante' ;;
+esac
+: "${SSH_PASSWORD:?$pdw_ssh_required}"
+exec passh -p "$SSH_PASSWORD" ssh \
+    -o StrictHostKeyChecking=yes \
+    -o UserKnownHostsFile=/etc/ssh/router_known_hosts \
+    "${SSH_USER:-pi}@${SSH_HOST:-127.0.0.1}"

@@ -1,0 +1,13 @@
+.git
+.env
+.secrets
+state
+logs
+backups
+node_modules
+**/__pycache__
+services/pihole/etc-pihole
+services/ttyd/home
+config/ttyd/router_known_hosts
+config/dhcp/leases
+hardware

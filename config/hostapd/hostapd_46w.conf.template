@@ -1,0 +1,279 @@
+# =======================================================================
+# HOSTAPD - Configurazione Access Point Wi-Fi
+# Traduzione / Translation: HOSTAPD: Wi-Fi access-point configuration
+# =======================================================================
+# Questo file configura un Access Point Wi-Fi 6 (802.11ax) sulla banda
+# 2.4 GHz con sicurezza WPA2-Personal, bridgato su br0.
+# Adattatore: MT7915E PCIe
+# Traduzione / Translation: Wi-Fi 6 / 802.11ax AP on 2.4 GHz with WPA2-Personal and br0 bridging. Adapter: MT7915E PCIe.
+# =======================================================================
+
+
+# =======================================================================
+# --- 1. RETE E IDENTIFICAZIONE ---
+# Traduzione / Translation: 1. NETWORK AND IDENTITY
+# =======================================================================
+
+# Nome della rete Wi-Fi visibile ai client
+# Traduzione / Translation: Network name visible to Wi-Fi clients
+ssid=${SSID1}
+
+# Password WPA2 per la connessione
+# Traduzione / Translation: WPA2 connection passphrase
+wpa_passphrase=${WPA_PASSPHRASE1}
+
+# Interfaccia bridge a cui viene agganciato l'AP
+# I client Wi-Fi saranno sulla stessa rete L2 del bridge
+# Traduzione / Translation: Bridge interface joined by the AP; Wi-Fi clients share its layer-2 network
+bridge=br0
+
+# Interfaccia fisica Wi-Fi utilizzata per l'AP
+# Traduzione / Translation: Physical Wi-Fi interface used by the AP
+interface=$AP_INTERFACE1
+
+# Codice paese (determina canali e potenze consentite)
+# Traduzione / Translation: Country code determines permitted channels and transmit power
+country_code=IT
+
+# Annuncia ai client il paese e i vincoli radio configurati
+# Permette ai client di conoscere canali e potenze ammesse
+# Traduzione / Translation: Advertise the configured country and radio constraints so clients know allowed channels and power
+ieee80211d=1
+
+# SSID visibile (0 = visibile, 1 = nascosto)
+# Traduzione / Translation: SSID visibility: 0 visible, 1 hidden
+ignore_broadcast_ssid=0
+
+
+# =======================================================================
+# --- 2. RADIO E CANALE ---
+# Traduzione / Translation: 2. RADIO AND CHANNEL
+# =======================================================================
+
+# Modalità radio: g = 2.4 GHz (b/g/n), a = 5/6 GHz (a/n/ac/ax)
+# Traduzione / Translation: Radio mode: g = 2.4 GHz b/g/n; a = 5/6 GHz a/n/ac/ax
+hw_mode=g
+
+# Canale di trasmissione
+# 2.4 GHz: 1-11  |  5 GHz: 36, 149  |  5 GHz DFS: 52, 100, 116, 132
+# Traduzione / Translation: Transmit channel: 2.4 GHz 1–11; 5 GHz 36/149; DFS examples 52/100/116/132
+channel=1
+
+# Estensione dell'hostapd compilato nel Dockerfile: forza i 40 MHz
+# Salta i controlli di coesistenza 20/40 MHz; impostare 0 per rispettarli
+# Mantenuta qui per separare il test beamforming dal cambio di larghezza
+# Traduzione / Translation: Extension compiled into hostapd to force 40 MHz and skip 20/40 coexistence checks. Set 0 to respect
+# IT/EN: them. Kept separate from beamforming testing.
+force_ht40=1
+
+# Driver: nl80211 è lo standard per tutti i driver mac80211 del kernel Linux
+# e per i driver moderni Realtek
+# Traduzione / Translation: nl80211 is the standard driver interface for Linux mac80211 and modern Realtek drivers
+driver=nl80211
+
+
+# =======================================================================
+# --- 3. SICUREZZA (WPA2-Personal) ---
+# Traduzione / Translation: 3. SECURITY: WPA2-Personal
+# =======================================================================
+
+# Algoritmi di autenticazione
+# 1 = Open System; Shared Key riguarda WEP, non è necessario per SAE
+# Traduzione / Translation: Authentication algorithms: 1 means Open System. Shared Key is for WEP and is not required by SAE.
+auth_algs=1
+
+# Abilita WPA (2 = WPA2 obbligatorio, necessario anche per WPA3)
+# Traduzione / Translation: Enable WPA: 2 requires WPA2 and is also needed for WPA3
+wpa=2
+
+# Gestione chiavi: WPA-PSK = WPA2-Personal con password condivisa
+# Traduzione / Translation: WPA-PSK key management means WPA2-Personal with a shared passphrase
+wpa_key_mgmt=WPA-PSK
+
+# Cifratura: CCMP = AES (lo standard sicuro, non usare TKIP)
+# Traduzione / Translation: CCMP encryption uses AES; do not use TKIP
+rsn_pairwise=CCMP
+wpa_pairwise=CCMP
+
+# Opportunistic Key Caching (0 = disabilitato)
+# La cache PMK non abilita da sola il roaming 802.11r tra router e AP
+# Traduzione / Translation: Opportunistic Key Caching, 0 disabled. A PMK cache alone does not enable 802.11r roaming between
+# IT/EN: router and AP.
+okc=0
+
+
+# =======================================================================
+# --- 4. WI-FI 4 (802.11n) ---
+# Traduzione / Translation: 4. WI-FI 4 / 802.11n
+# =======================================================================
+
+# Abilita 802.11n (Wi-Fi 4) — obbligatorio per Wi-Fi 6 su 2.4 GHz
+# Traduzione / Translation: Enable 802.11n, required for Wi-Fi 6 on 2.4 GHz
+ieee80211n=1
+
+# Wi-Fi Multimedia (WMM) — obbligatorio per Wi-Fi 4 e superiori
+# Gestisce la priorità del traffico (voce, video, best effort, background)
+# Traduzione / Translation: WMM is required for Wi-Fi 4 and later; it prioritizes voice, video, best-effort and background traffic
+wmm_enabled=1
+
+# Capacità HT (High Throughput) dell'adattatore MT7915E PCIe
+# Capabilities bitmap: 0x9ff
+# Traduzione / Translation: MT7915E PCIe HT capabilities; bitmap 0x9ff
+#
+#   [LDPC]            - Low Density Parity Check: migliore correzione errori
+#   [HT40+]           - Secondario sopra il primario, corretto per il canale 1
+#   [GF]              - Greenfield: frame solo 802.11n (più efficiente)
+#   [SHORT-GI-20]     - Guard Interval corto su 20 MHz (più throughput)
+#   [SHORT-GI-40]     - Guard Interval corto su 40 MHz (più throughput)
+#   [TX-STBC]         - Space-Time Block Coding in trasmissione (più affidabilità)
+#   [RX-STBC1]        - STBC in ricezione (1 spatial stream)
+#   [MAX-AMSDU-7935]  - Frame aggregati fino a 7935 byte (più efficienza)
+# Traduzione / Translation: HT tokens: LDPC improves error correction; HT40+ places secondary above primary, correct for channel
+# IT/EN: 1; GF uses 802.11n-only frames; SHORT-GI-20/40 shorten guard intervals; TX-STBC and RX-STBC1 provide
+# IT/EN: transmit/one-stream receive coding; MAX-AMSDU-7935 aggregates up to 7935 bytes.
+#
+ht_capab=[LDPC][HT40+][GF][SHORT-GI-20][SHORT-GI-40][TX-STBC][RX-STBC1][MAX-AMSDU-7935]
+
+
+# =======================================================================
+# --- 5. WI-FI 6 (802.11ax) ---
+# Traduzione / Translation: 5. WI-FI 6 / 802.11ax
+# =======================================================================
+
+# Abilita 802.11ax (Wi-Fi 6)
+# Traduzione / Translation: Enable 802.11ax / Wi-Fi 6
+ieee80211ax=1
+
+# BSS Color: distingue le trasmissioni HE dei BSS (range: 1-63)
+# Valore locale; la distinzione dai vicini non elimina le interferenze
+# Traduzione / Translation: BSS Color distinguishes HE transmissions, range 1–63. A locally distinct color does not eliminate
+# IT/EN: interference.
+he_bss_color=21
+
+# Ruoli HE supportati dalle MT7915E, con quattro antenne collegate
+# Beamformer: l'AP trasmette usando il feedback dei client compatibili
+# Beamformee: l'AP fornisce feedback per le trasmissioni ricevute
+# Il beneficio dipende dai client; non riguarda i dispositivi solo HT
+# Traduzione / Translation: MT7915E HE roles with four connected antennas: the beamformer transmits using compatible-client
+# IT/EN: feedback; the beamformee provides feedback for received transmissions. Benefits depend on clients and
+# IT/EN: do not apply to HT-only devices.
+he_su_beamformer=1
+he_su_beamformee=1
+he_mu_beamformer=1
+
+
+# =======================================================================
+# --- 6. PARAMETRI OPERATIVI ---
+# Traduzione / Translation: 6. OPERATIONAL SETTINGS
+# =======================================================================
+
+# Intervallo beacon in TU da 1,024 ms: 75 TU = 76,8 ms (default 100 TU)
+# I beacon sono i frame che annunciano l'esistenza dell'AP
+# Traduzione / Translation: Beacon interval in 1.024 ms TU: 75 TU = 76.8 ms; default 100 TU. Beacons advertise the AP.
+beacon_int=75
+
+# DTIM period: ogni quanti beacon viene inviato un DTIM
+# 1 = ogni beacon (bassa latenza, più consumo batteria sui client)
+# Traduzione / Translation: DTIM period counts beacons: 1 means every beacon, lowering latency but increasing client battery use
+dtim_period=1
+
+# Inactivity poll: verifica se i client inattivi sono ancora connessi
+# 0 = abilitato (comportamento standard)
+# Traduzione / Translation: Inactive-client polling: 0 enables the standard check that idle clients are still connected
+skip_inactivity_poll=0
+
+# Disconnetti client con troppi ACK mancanti
+# 0 = disabilitato (più tollerante con client lontani o instabili)
+# Traduzione / Translation: Disconnect clients with excessive missing ACKs: 0 disables this for tolerance of distant/unstable
+# IT/EN: clients
+disassoc_low_ack=0
+
+
+# =======================================================================
+# --- 7. LOGGING E CONTROLLO ---
+# Traduzione / Translation: 7. LOGGING AND CONTROL
+# =======================================================================
+
+# Moduli di log (bitfield, -1 = tutti):
+#   bit 0 (1)  = IEEE 802.11
+#   bit 1 (2)  = IEEE 802.1X
+#   bit 2 (4)  = RADIUS
+#   bit 3 (8)  = WPA
+#   bit 4 (16) = Driver interface
+#   bit 6 (64) = MLME
+# Traduzione / Translation: Log-module bitfield, -1 for all: IEEE 802.11=1, IEEE 802.1X=2, RADIUS=4, WPA=8, driver interface=16,
+# IT/EN: MLME=64.
+logger_syslog=-1
+
+# Livello minimo di log:
+#   0 = verbose debug, 1 = debug, 2 = info, 3 = notice, 4 = warning
+# Traduzione / Translation: Minimum logging level: 0 verbose debug, 1 debug, 2 info, 3 notice, 4 warning
+logger_syslog_level=2
+
+# Socket di controllo per hostapd_cli
+# Traduzione / Translation: Control socket for hostapd_cli
+ctrl_interface=/var/run/hostapd
+ctrl_interface_group=0
+
+
+# =======================================================================
+# --- OPZIONI COMMENTATE (Riferimento) ---
+# Traduzione / Translation: COMMENTED REFERENCE OPTIONS
+# =======================================================================
+#
+# --- Limiti client ---
+# Traduzione / Translation: Client limits
+# max_num_sta=30              # Numero massimo di client connessi | IT/EN: Maximum connected-client count
+#
+# --- HT 20 MHz (alternativa conservativa) ---
+# Impostare anche force_ht40=0 quando si prova questa alternativa
+# Traduzione / Translation: Conservative 20 MHz HT alternative; also set force_ht40=0 when testing it
+# ht_capab=[LDPC][GF][SHORT-GI-20][TX-STBC][RX-STBC1][MAX-AMSDU-7935]
+#
+# --- WDS (Wireless Distribution System) ---
+# Traduzione / Translation: Wireless Distribution System, WDS
+# wds_sta=1                   # Abilita WDS per bridge wireless | IT/EN: Enable WDS for wireless bridging
+#
+# --- Preamble ---
+# Traduzione / Translation: Preambolo
+# preamble=1                  # Short preamble (riduce overhead) | IT/EN: Short preamble reduces overhead
+#
+# --- Tolleranza handshake ---
+# Traduzione / Translation: Handshake tolerance
+# eapol_key_timeout_interval=1000  # Timeout EAPOL più permissivo (ms) | IT/EN: More permissive EAPOL timeout, milliseconds
+# eapol_key_retries=4              # Tentativi extra per handshake lento | IT/EN: Extra attempts for slow handshakes
+#
+# --- Tuning code trasmissione ---
+# tx_queue_data2_aifs=1
+# tx_queue_data2_cwmin=7
+# tx_queue_data2_cwmax=15
+# tx_queue_data2_burst=3.0
+# Traduzione / Translation: Transmit-queue tuning: AIFS 1, CWmin 7, CWmax 15 and burst 3.0 for tx_queue_data2
+#
+# --- Multicast ---
+# Traduzione / Translation: Multicast
+# multicast_to_unicast=0      # Converti multicast in unicast (0 = no) | IT/EN: Convert multicast to unicast; 0 disables it
+#
+# --- Require HT ---
+# Traduzione / Translation: Richiede HT
+# require_ht=1                # Rifiuta client senza supporto 802.11n | IT/EN: Reject clients without 802.11n support
+
+# =======================================================================
+# WPS a pulsante: l'associazione si apre dalla dashboard per 120 secondi.
+# PIN e registratori esterni non sono abilitati. Password Wi-Fi conservata.
+# Le due radio condividono l’identità WPS e la stessa finestra di associazione.
+# Traduzione / Translation: Push-button WPS opens from the dashboard for 120 seconds. No PIN or external registrars are enabled,
+# IT/EN: and the Wi-Fi password is retained. Both radios share WPS identity and pairing window.
+# =======================================================================
+wps_state=2
+wps_independent=0
+# UUID identico nei due template: è lo stesso access point.
+# Traduzione / Translation: Use the same UUID in both templates: they are one access point
+uuid=${WPS_UUID}
+ap_setup_locked=1
+config_methods=virtual_push_button
+eap_server=1
+device_name=Pi-Dock-Wifi
+manufacturer=Pi-Lab
+model_name=Pi-Dock-Wifi
+device_type=6-0050F204-1

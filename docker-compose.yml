@@ -1,0 +1,108 @@
+# ════════════════════════════════════════════════════════════════════════
+# PI-ROUTER STACK
+# Traduzione / Translation: STACK DEL ROUTER
+# ════════════════════════════════════════════════════════════════════════
+
+services:
+
+  # ────────────────────────────────────────────────────────────────────
+  # PI-DOCK-WIFI - RETE E ACCESS POINT
+  # Traduzione / Translation: PI-DOCK-WIFI: NETWORK AND ACCESS POINT
+  # ────────────────────────────────────────────────────────────────────
+  pi-dock-wifi:
+    image: pi-dock-wifi:1.0.0
+    pull_policy: never  # Immagine locale: si aggiorna tramite build. | EN: Local image; update it with a build.
+    build: .
+    container_name: pi-dock-wifi
+    restart: always
+    env_file:
+    - .env
+    environment:
+    - CONFIG_FILES=/etc/hostapd/hostapd_46w.conf /etc/hostapd/hostapd_56w.conf
+    - AP_INTERFACE1=wlan0
+    - AP_INTERFACE2=wlan1
+    - INTERNET=eth0
+    - SSID1=${SSID1:?Set in .env}
+    - SSID2=${SSID2:?Set in .env}
+    - TZ=Europe/Rome
+    - DASHBOARD_PASSWORD=${DASHBOARD_PASSWORD:?Set in .env}
+    - APP_LANGUAGE=${APP_LANGUAGE:-it}
+    - NGINX_ACCESS_MAX_LINES=15000
+    - NGINX_ERROR_MAX_LINES=5000
+    - NGINX_LOG_ROTATE_SECONDS=60
+    network_mode: host
+    privileged: true
+    volumes:
+    - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro
+    - ./state/uplink:/var/lib/pi-dock-wifi/uplink
+    - ./config/recovery/config.json:/opt/pi-dock-wifi/recovery/config.json:ro
+    - ./logs:/var/log
+    - /etc/resolv.conf:/etc/resolv.conf
+    - /etc/hosts:/etc/hosts
+    - /etc/nsswitch.conf:/etc/nsswitch.conf
+    - /etc/localtime:/etc/localtime:ro
+    - ./config/hostapd/4w.deny:/etc/hostapd/4w.deny
+    - ./config/hostapd/6w.deny:/etc/hostapd/6w.deny
+    - ./config/hostapd/hostapd_46w.conf.template:/etc/hostapd/hostapd_46w.conf.template
+    - ./config/hostapd/hostapd_56w.conf.template:/etc/hostapd/hostapd_56w.conf.template
+    - ./config/iptables/iptables-rules.sh:/bin/iptables-rules.sh
+    - ./config/dhcp/dnsmasq.conf:/etc/dnsmasq.conf
+    - ./config/start-scripts/dnsmasq_start.sh:/bin/dnsmasq_start.sh
+    - ./config/start-scripts/server-routes.sh:/bin/server-routes.sh
+    - ./config/dhcp/dhclient.conf:/etc/dhcp/dhclient.conf
+    - ./config/dhcp/leases/dnsmasq.leases:/var/lib/misc/dnsmasq.leases
+    - ./config/start-scripts/start_hostapd.sh:/bin/start_hostapd.sh
+    - ./config/start-scripts/monitor_ip.sh:/bin/monitor_ip.sh
+    - ./config/start-scripts/check_nsswitch.sh:/bin/check_nsswitch.sh
+    - ./config/entrypoint.sh:/bin/entrypoint.sh
+    - ./config/healthcheck.sh:/bin/healthcheck.sh
+    - ./config/logger.sh:/bin/logger.sh
+
+  # ────────────────────────────────────────────────────────────────────
+  # PI-HOLE - DNS E FILTRAGGIO
+  # Traduzione / Translation: PI-HOLE: DNS AND FILTERING
+  # ────────────────────────────────────────────────────────────────────
+  pihole:
+    env_file:
+    - .env
+    container_name: pihole
+    image: pihole/pihole:2026.10.1
+    network_mode: host
+    environment:
+      TZ: Europe/Rome
+      FTLCONF_dns_listeningMode: all
+      FTLCONF_dns_port: 15353
+      FTLCONF_dns_upstreamsTimeout: 2
+      FTLCONF_webserver_domain: ${LOCAL_DOMAIN:-home.arpa}
+      FTLCONF_webserver_api_password: ${PIHOLE_PASSWORD:?Set in .env}
+      FTLCONF_webserver_port: 8090o,[::]:8090o
+      FTLCONF_misc_dnsmasq_lines: ${PIHOLE_EXTRA_DNS:-stop-dns-rebind}
+    volumes:
+    - ./services/pihole/etc-pihole:/etc/pihole
+    cap_add:
+    - NET_ADMIN
+    - SYS_TIME
+    - SYS_NICE
+    restart: always
+    depends_on:
+      pi-dock-wifi:
+        condition: service_healthy
+
+  # ────────────────────────────────────────────────────────────────────
+  # TTYD - TERMINALE WEB
+  # Traduzione / Translation: TTYD: WEB TERMINAL
+  # ────────────────────────────────────────────────────────────────────
+  ttyd:
+    image: pi-dock-wifi-ttyd:1.7.7
+    pull_policy: never  # Immagine locale: si aggiorna tramite build. | EN: Local image; update it with a build.
+    env_file:
+    - .env
+    build: ./services/ttyd
+    container_name: ttyd
+    volumes:
+    - ./config/ttyd/sshconnect:/usr/local/bin/sshconnect:ro
+    - ./config/ttyd/start-ttyd:/usr/local/bin/start-ttyd:ro
+    - ./config/ttyd/router_known_hosts:/etc/ssh/router_known_hosts:ro
+    - ./services/ttyd/home:/home/terminal
+    network_mode: host
+    restart: always

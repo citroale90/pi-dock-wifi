@@ -1,0 +1,15 @@
+.env
+.secrets/
+state/
+logs/
+backups/
+__pycache__/
+*.pyc
+*.log
+node_modules/
+services/pihole/etc-pihole/
+services/ttyd/home/
+config/ttyd/router_known_hosts
+config/recovery/config.json
+config/dhcp/leases/
+.DS_Store

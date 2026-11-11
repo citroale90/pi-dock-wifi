@@ -1,0 +1,85 @@
+# Reference snapshot, not an installation script. Read docs/it/HARDWARE.md.
+# For more options and information see
+# http://rptl.io/configtxt
+# Some settings may impact device functionality. See link above for details
+# Traduzione / Translation: Istantanea di riferimento, non uno script di installazione: leggere docs/it/HARDWARE.md. Altre
+# IT/EN: opzioni: http://rptl.io/configtxt. Alcune impostazioni modificano il funzionamento del dispositivo;
+# IT/EN: consultare la documentazione.
+
+# Uncomment some or all of these to enable the optional hardware interfaces
+# Traduzione / Translation: Decommentare le righe desiderate per abilitare le interfacce hardware opzionali
+dtparam=i2c_arm=on
+#dtparam=i2s=on
+dtparam=spi=on
+
+# Enable audio (loads snd_bcm2835)
+# Traduzione / Translation: Abilita l’audio caricando snd_bcm2835
+# dtparam=audio=on  # disabilitato per HiFiBerry
+
+# Additional overlays and parameters are documented
+# /boot/firmware/overlays/README
+# Traduzione / Translation: Overlay e parametri aggiuntivi sono documentati in /boot/firmware/overlays/README
+
+# Automatically load overlays for detected cameras
+# Traduzione / Translation: Carica automaticamente gli overlay delle fotocamere rilevate
+camera_auto_detect=1
+
+# Automatically load overlays for detected DSI displays
+# Traduzione / Translation: Carica automaticamente gli overlay dei display DSI rilevati
+display_auto_detect=1
+
+# Automatically load initramfs files, if found
+# Traduzione / Translation: Carica automaticamente i file initramfs se presenti
+auto_initramfs=1
+
+# Enable DRM VC4 V3D driver
+# Traduzione / Translation: Abilita il driver grafico DRM VC4 V3D
+dtoverlay=vc4-kms-v3d
+max_framebuffers=2
+
+# Don't have the firmware create an initial video= setting in cmdline.txt.
+# Use the kernel's default instead.
+# Traduzione / Translation: Non inserire video= iniziale in cmdline.txt tramite firmware; usa il default del kernel
+disable_fw_kms_setup=1
+
+# Run in 64-bit mode
+# Traduzione / Translation: Esegue il sistema in modalità a 64 bit
+arm_64bit=1
+
+# Disable compensation for displays with overscan
+# Traduzione / Translation: Disabilita la compensazione overscan dei display
+disable_overscan=1
+
+# Run as fast as firmware / board allows
+# Traduzione / Translation: Usa la velocità massima consentita da firmware e scheda
+arm_boost=1
+
+[cm4]
+# Enable host mode on the 2711 built-in XHCI USB controller.
+# This line should be removed if the legacy DWC2 controller is required
+# (e.g. for USB device mode) or if USB support is not required.
+# Traduzione / Translation: Abilita la modalità host del controller USB XHCI integrato nel 2711. Rimuovere questa riga se serve il
+# IT/EN: controller DWC2 legacy, per esempio in modalità dispositivo USB, o se USB non serve.
+otg_mode=1
+
+[cm5]
+dtoverlay=dwc2,dr_mode=host
+
+[all]
+usb_max_current_enable=1
+
+over_voltage_delta=50000
+arm_freq=2800
+gpu_freq=900
+
+dtoverlay=pcie-32bit-dma-pi5
+dtoverlay=disable-wifi
+dtparam=pciex1_gen=3
+dtoverlay=dwc2,dr_mode=peripheral
+#dtoverlay=googlevoicehat-soundcard
+
+# Kernel custom Wi-Fi - non gestito da APT
+# Traduzione / Translation: Custom Wi-Fi kernel: not managed by APT
+[pi5]
+kernel=kernel_2712_wifi.img
+[all]

@@ -1,0 +1,432 @@
+
+# =======================================================================
+# HOSTAPD - Configurazione Access Point Wi-Fi 6 (5 GHz)
+# Traduzione / Translation: HOSTAPD: 5 GHz Wi-Fi 6 access-point configuration
+# =======================================================================
+# Questo file configura un Access Point Wi-Fi 6 (802.11ax) sulla banda
+# 5 GHz con canale a 80 MHz, sicurezza WPA2-Personal, bridgato su br0.
+# Adattatore: MT7915E PCIe (driver in-kernel mt76)
+# Traduzione / Translation: Wi-Fi 6 / 802.11ax AP on 5 GHz, 80 MHz channel, WPA2-Personal and br0 bridge. Adapter: MT7915E PCIe
+# IT/EN: with in-kernel mt76 driver.
+#
+# Le MT7915E installate non supportano 6 GHz. Le note 6 GHz qui sotto
+# sono solo un riferimento per altro hardware, non opzioni da attivare.
+# Requisiti per operare su 6 GHz con hardware compatibile:
+#   - WPA3 obbligatorio (wpa_key_mgmt=SAE, ieee80211w=2)
+#   - WME/WMM obbligatori
+#   - Operating Class (op_class) obbligatorio
+# Traduzione / Translation: The installed MT7915E cards do not support 6 GHz. Notes below are references for other hardware, not
+# IT/EN: options to enable here. Compatible 6 GHz hardware requires WPA3/SAE, ieee80211w=2, WME/WMM and an
+# IT/EN: operating class.
+#
+# Note:
+#   - Testato su RasPi4B con RasPiOS 64 bit
+#   - Richiede hostapd >= 2.10 per supporto Wi-Fi 6/6e
+#   - I test mostrano portata ridotta su 6 GHz rispetto a 5 GHz
+# Traduzione / Translation: Original reference notes: tested on RasPi4B/RasPiOS 64-bit, hostapd 2.10+ required for Wi-Fi 6/6E, and
+# IT/EN: reduced range at 6 GHz compared with 5 GHz. These are not new validation claims.
+# =======================================================================
+
+
+# =======================================================================
+# --- 1. RETE E IDENTIFICAZIONE ---
+# Traduzione / Translation: 1. NETWORK AND IDENTITY
+# =======================================================================
+
+# Nome della rete Wi-Fi visibile ai client
+# Traduzione / Translation: Network name visible to Wi-Fi clients
+ssid=${SSID2}
+
+# Password WPA2 per la connessione
+# Traduzione / Translation: WPA2 connection passphrase
+wpa_passphrase=${WPA_PASSPHRASE2}
+# WPA3 richiede SAE e PMF; sae_password può definire una password SAE:
+# Traduzione / Translation: WPA3 requires SAE and PMF; sae_password can define an SAE passphrase
+#sae_password=$WPA_PASSPHRASE2
+
+# Interfaccia bridge a cui viene agganciato l'AP
+# I client Wi-Fi saranno sulla stessa rete L2 del bridge
+# Traduzione / Translation: Bridge interface joined by the AP; Wi-Fi clients share its layer-2 network
+bridge=br0
+
+# Interfaccia fisica Wi-Fi utilizzata per l'AP
+# Traduzione / Translation: Physical Wi-Fi interface used by the AP
+interface=$AP_INTERFACE2
+
+# Codice paese (determina canali e potenze consentite)
+# Traduzione / Translation: Country code determines permitted channels and transmit power
+country_code=IT
+
+# Annuncia ai client il paese e i vincoli radio configurati
+# Traduzione / Translation: Advertise country and configured radio constraints to clients
+ieee80211d=1
+
+# Supporto DFS (Dynamic Frequency Selection) per canali 5 GHz
+# Richiede ieee80211d=1. Necessario se si usano canali DFS (52-140)
+#ieee80211h=1
+# Traduzione / Translation: DFS support for 5 GHz requires ieee80211d=1; ieee80211h=1 is needed for DFS channels 52–140
+
+# SSID visibile (0 = visibile, 1 = nascosto)
+# Traduzione / Translation: SSID visibility: 0 visible, 1 hidden
+ignore_broadcast_ssid=0
+
+# Ambiente operativo (solo per 6 GHz):
+#country3=0x20    # Default | IT/EN: Predefinito
+#country3=0x4f    # Outdoor | IT/EN: Esterno
+#country3=0x49    # Indoor only | IT/EN: Solo interno
+#he_6ghz_reg_pwr_type=0
+# Traduzione / Translation: 6 GHz-only operating environment: country3=0x20 default, 0x4f outdoor, 0x49 indoor;
+# IT/EN: he_6ghz_reg_pwr_type is the related setting
+
+
+# =======================================================================
+# --- 2. RADIO E CANALE ---
+# Traduzione / Translation: 2. RADIO AND CHANNEL
+# =======================================================================
+
+# Modalità radio: a = 5/6 GHz (a/n/ac/ax), g = 2.4 GHz (b/g/n)
+# Traduzione / Translation: Radio mode: a = 5/6 GHz a/n/ac/ax; g = 2.4 GHz b/g/n
+hw_mode=a
+
+# Canale di trasmissione
+# 5 GHz standard: 36, 149  |  5 GHz DFS: 52, 100, 116, 132  |  6 GHz: vedi op_class
+# Traduzione / Translation: Transmit channel examples: 5 GHz 36/149, DFS 52/100/116/132; for 6 GHz see op_class
+channel=36
+
+# Operating Class — solo per 6 GHz
+# Determina la larghezza di canale:
+#   131 = 20 MHz, 132 = 40 MHz, 133 = 80 MHz, 134 = 160 MHz
+# Vedi documentazione in fondo per la lista completa dei canali validi
+# Traduzione / Translation: 6 GHz operating class sets bandwidth: 131=20 MHz, 132=40 MHz, 133=80 MHz, 134=160 MHz; see
+# IT/EN: documentation below for permitted channels
+#op_class=133
+
+# Driver: nl80211 è lo standard per driver mac80211 del kernel Linux
+# Traduzione / Translation: nl80211 is the standard Linux mac80211 driver interface
+driver=nl80211
+
+
+# =======================================================================
+# --- 3. SICUREZZA (WPA2-Personal) ---
+# Traduzione / Translation: 3. SECURITY: WPA2-Personal
+# =======================================================================
+
+# Algoritmi di autenticazione
+# 1 = Open System; Shared Key riguarda WEP, non è necessario per SAE
+# Traduzione / Translation: Authentication algorithms: 1 means Open System. Shared Key is for WEP and is not required by SAE.
+auth_algs=1
+
+# Abilita WPA (2 = WPA2, necessario anche per WPA3)
+# Traduzione / Translation: Enable WPA: 2 selects WPA2 and is also needed for WPA3
+wpa=2
+
+# Cifrature negoziate dai client: CCMP e CCMP-256; non abilitano WPA3
+# Traduzione / Translation: CCMP and CCMP-256 are negotiated encryption suites; they do not enable WPA3
+rsn_pairwise=CCMP CCMP-256
+
+# --- Opzione 1: WPA2-Personal (attiva) ---
+# Traduzione / Translation: Option 1: WPA2-Personal, active
+wpa_key_mgmt=WPA-PSK WPA-PSK-SHA256
+
+# --- Opzione 2: WPA2/WPA3 Transitional (compatibilità mista) ---
+# Alcuni dispositivi vecchi potrebbero non funzionare
+# Traduzione / Translation: Option 2: mixed WPA2/WPA3 transitional mode; some older devices may fail
+#wpa_key_mgmt=SAE WPA-PSK WPA-PSK-SHA256
+#ieee80211w=1
+# Traduzione / Translation: ieee80211w=1
+#sae_require_mfp=1
+
+# --- Opzione 3: WPA3-Personal (obbligatorio per 6 GHz) ---
+# Alcuni dispositivi vecchi potrebbero non funzionare
+# Traduzione / Translation: Option 3: WPA3-Personal, mandatory for 6 GHz; some older devices may fail
+#wpa_key_mgmt=SAE
+#ieee80211w=2
+# Traduzione / Translation: ieee80211w=2
+
+# Cache PMK; non abilita da sola il roaming 802.11r tra router e AP
+# Traduzione / Translation: PMK caching alone does not enable 802.11r roaming between router and AP
+okc=1
+
+
+# =======================================================================
+# --- 4. WI-FI 4 (802.11n / HT) ---
+# Traduzione / Translation: 4. WI-FI 4 / 802.11n HT
+# =======================================================================
+
+# Abilita 802.11n — necessario come base per Wi-Fi 5 e 6
+# Traduzione / Translation: Enable 802.11n as the basis for Wi-Fi 5 and 6
+ieee80211n=1
+
+# Capacità HT dell'adattatore MT7915E PCIe (bitmap: 0x9ff)
+# Traduzione / Translation: MT7915E PCIe HT capabilities, bitmap 0x9ff
+#
+#   [LDPC]            - Correzione errori avanzata
+#   [HT40+]           - Secondario sopra il primario, corretto per il canale 36
+#   [GF]              - Greenfield mode (frame solo 802.11n)
+#   [SHORT-GI-20]     - Guard Interval corto su 20 MHz
+#   [SHORT-GI-40]     - Guard Interval corto su 40 MHz
+#   [TX-STBC]         - Space-Time Block Coding in TX
+#   [RX-STBC1]        - STBC in RX (1 spatial stream)
+#   [MAX-AMSDU-7935]  - Frame aggregati fino a 7935 byte
+# Traduzione / Translation: HT tokens: LDPC error correction; HT40+ secondary above primary for channel 36; GF 802.11n-only
+# IT/EN: frames; short guard intervals at 20/40 MHz; transmit STBC, one-stream receive STBC and A-MSDU up to
+# IT/EN: 7935 bytes.
+#
+ht_capab=[LDPC][HT40+][GF][SHORT-GI-20][SHORT-GI-40][TX-STBC][RX-STBC1][MAX-AMSDU-7935]
+
+
+# =======================================================================
+# --- 5. WI-FI 5 (802.11ac / VHT) ---
+# Traduzione / Translation: 5. WI-FI 5 / 802.11ac VHT
+# =======================================================================
+# Commentare tutta questa sezione se si opera su 2.4 GHz
+# Traduzione / Translation: Comment out this entire section when operating at 2.4 GHz
+
+# Abilita 802.11ac (Wi-Fi 5)
+# Traduzione / Translation: Enable 802.11ac / Wi-Fi 5
+ieee80211ac=1
+
+# Larghezza canale VHT (0 = 20/40 MHz, 1 = 80 MHz)
+# Traduzione / Translation: VHT bandwidth: 0 = 20/40 MHz, 1 = 80 MHz
+vht_oper_chwidth=1
+
+# Il blocco 80 MHz dei primari 36/40/44/48 ha centro 42
+# Primario + 6 vale per 36, non è una formula generale
+# Traduzione / Translation: The 80 MHz block for primary channels 36/40/44/48 is centered on 42. Primary + 6 works for 36, not as
+# IT/EN: a general formula.
+vht_oper_centr_freq_seg0_idx=42
+
+# Capacità VHT della MT7915E: hardware 0x739b79f1, profilo a 80 MHz
+# Il limite MPDU rilevato è 7991 byte; non usare MAX-MPDU-11454
+# Traduzione / Translation: MT7915E VHT hardware capabilities 0x739b79f1, 80 MHz profile. Detected maximum MPDU is 7991 bytes; do
+# IT/EN: not use MAX-MPDU-11454.
+#
+#   [RXLDPC]              - LDPC in ricezione
+#   [SHORT-GI-80]         - Guard Interval corto su 80 MHz
+#   [TX-STBC-2BY1]        - STBC in TX (2 antenne, 1 stream)
+#   [SU-BEAMFORMER]       - Beamforming single-user in trasmissione
+#   [SU-BEAMFORMEE]       - Feedback per beamforming in ricezione
+#   [MU-BEAMFORMER]       - Beamforming multi-user in trasmissione
+#   MU-BEAMFORMEE non è un token gestito dal parser di questo hostapd
+#          - Feedback per beamforming in ricezione
+#   [RX-ANTENNA-PATTERN]  - Pattern antenna RX fisso
+#   [TX-ANTENNA-PATTERN]  - Pattern antenna TX fisso
+#   [RX-STBC-1]           - STBC in RX (1 spatial stream)
+#   [BF-ANTENNA-4]        - Feedback per un beamformer fino a 4 dimensioni
+#   [SOUNDING-DIMENSION-4]- Sounding fino a 4 dimensioni in trasmissione
+#   [MAX-MPDU-7991]       - MPDU massimo ricevibile: 7991 byte
+#   [MAX-A-MPDU-LEN-EXP7] - A-MPDU max 1048k (2^(13+7)-1)
+# Traduzione / Translation: VHT tokens cover receive LDPC, short 80 MHz guard interval, transmit/receive STBC, SU/MU transmit
+# IT/EN: beamforming and SU receive feedback, fixed antenna patterns, four-dimensional feedback/sounding, MPDU
+# IT/EN: 7991 and A-MPDU exponent 7 (1048k). MU-BEAMFORMEE is not accepted by this hostapd parser.
+#
+vht_capab=[RXLDPC][SHORT-GI-80][TX-STBC-2BY1][SU-BEAMFORMER][SU-BEAMFORMEE][MU-BEAMFORMER][RX-ANTENNA-PATTERN][TX-ANTENNA-PATTERN][RX-STBC-1][BF-ANTENNA-4][SOUNDING-DIMENSION-4][MAX-MPDU-7991][MAX-A-MPDU-LEN-EXP7]
+
+
+# =======================================================================
+# --- 6. WI-FI 6 (802.11ax / HE) ---
+# Traduzione / Translation: 6. WI-FI 6 / 802.11ax HE
+# =======================================================================
+
+# Abilita 802.11ax (Wi-Fi 6)
+# Traduzione / Translation: Enable 802.11ax / Wi-Fi 6
+ieee80211ax=1
+
+# Larghezza canale HE (0 = 20/40 MHz, 1 = 80 MHz)
+# Commentare su 2.4 GHz
+# Traduzione / Translation: HE bandwidth: 0 = 20/40 MHz, 1 = 80 MHz; comment out for 2.4 GHz
+he_oper_chwidth=1
+
+# Centro HE coerente con il blocco VHT 36/40/44/48: indice 42
+# Commentare su 2.4 GHz
+# Traduzione / Translation: HE center must match the VHT 36/40/44/48 block, index 42; comment out for 2.4 GHz
+he_oper_centr_freq_seg0_idx=42
+
+# BSS Color: distingue le trasmissioni HE dei BSS (range: 1-63)
+# Valore locale; la distinzione dai vicini non elimina le interferenze
+# Traduzione / Translation: BSS Color distinguishes HE transmissions, range 1–63. A locally distinct color does not eliminate
+# IT/EN: interference.
+he_bss_color=37
+
+# Ruoli HE supportati dalle MT7915E, con quattro antenne collegate
+# Beamformer: l'AP trasmette usando il feedback dei client compatibili
+# Beamformee: l'AP fornisce feedback per le trasmissioni ricevute
+# Traduzione / Translation: MT7915E HE roles with four antennas: beamformer transmits using client feedback; beamformee provides
+# IT/EN: feedback on received transmissions
+he_su_beamformer=1
+he_su_beamformee=1
+he_mu_beamformer=1
+
+# --- MU-EDCA (Multi-User Enhanced Distributed Channel Access) ---
+# Parametri di accesso multi-utente, coincidenti con il profilo OpenWrt.
+# Ogni categoria di traffico (BE, BK, VI, VO) ha parametri dedicati.
+# Traduzione / Translation: MU-EDCA multi-user access settings match the OpenWrt profile. Each traffic category BE/BK/VI/VO has
+# IT/EN: dedicated values.
+#
+# Parametri globali QoS
+# Traduzione / Translation: Global QoS settings
+he_mu_edca_qos_info_param_count=0
+he_mu_edca_qos_info_q_ack=0
+he_mu_edca_qos_info_queue_request=0
+he_mu_edca_qos_info_txop_request=0
+#
+# Best Effort (traffico generico: web, email)
+# Traduzione / Translation: Best Effort: general traffic such as web and email
+he_mu_edca_ac_be_aifsn=8
+he_mu_edca_ac_be_aci=0
+he_mu_edca_ac_be_ecwmin=9
+he_mu_edca_ac_be_ecwmax=10
+he_mu_edca_ac_be_timer=255
+#
+# Background (traffico a bassa priorità: download, backup)
+# Traduzione / Translation: Background: low-priority traffic such as downloads and backups
+he_mu_edca_ac_bk_aifsn=15
+he_mu_edca_ac_bk_aci=1
+he_mu_edca_ac_bk_ecwmin=9
+he_mu_edca_ac_bk_ecwmax=10
+he_mu_edca_ac_bk_timer=255
+#
+# Video (streaming, videoconferenze)
+# Traduzione / Translation: Video: streaming and video calls
+he_mu_edca_ac_vi_aifsn=5
+he_mu_edca_ac_vi_aci=2
+he_mu_edca_ac_vi_ecwmin=5
+he_mu_edca_ac_vi_ecwmax=7
+he_mu_edca_ac_vi_timer=255
+#
+# Voice (VoIP, chiamate)
+# Traduzione / Translation: Voice: VoIP and phone calls
+he_mu_edca_ac_vo_aifsn=5
+he_mu_edca_ac_vo_aci=3
+he_mu_edca_ac_vo_ecwmin=5
+he_mu_edca_ac_vo_ecwmax=7
+he_mu_edca_ac_vo_timer=255
+
+
+# =======================================================================
+# --- 7. WMM (Wi-Fi Multimedia) ---
+# Traduzione / Translation: 7. WMM / Wi-Fi Multimedia
+# =======================================================================
+
+# WME (Wireless Multimedia Extensions) — obbligatorio per 6 GHz
+# Traduzione / Translation: WME / Wireless Multimedia Extensions is required for 6 GHz
+wme_enabled=1
+
+# WMM — obbligatorio per Wi-Fi 4 e superiori
+# Gestisce la priorità del traffico (voce, video, best effort, background)
+# Traduzione / Translation: WMM is required for Wi-Fi 4 and later and prioritizes voice/video/best-effort/background traffic
+wmm_enabled=1
+
+
+# =======================================================================
+# --- 8. PARAMETRI OPERATIVI ---
+# Traduzione / Translation: 8. OPERATIONAL SETTINGS
+# =======================================================================
+
+# Intervallo beacon in TU da 1,024 ms: 100 TU = 102,4 ms
+# Traduzione / Translation: Beacon interval in 1.024 ms TU: 100 TU = 102.4 ms
+beacon_int=100
+
+# DTIM period: ogni quanti beacon viene inviato un DTIM
+# 2 = ogni 2 beacon (buon compromesso latenza/batteria)
+# Traduzione / Translation: DTIM period 2 sends one every two beacons, balancing latency and battery use
+dtim_period=2
+
+# Inactivity poll (0 = abilitato)
+# Traduzione / Translation: Inactive-client polling: 0 enabled
+skip_inactivity_poll=0
+
+# Converti multicast in unicast (1 = attivo)
+# Migliora l'affidabilità del multicast su Wi-Fi a costo di più traffico
+# Traduzione / Translation: Multicast-to-unicast conversion: 1 enables it; improves Wi-Fi reliability at the cost of additional
+# IT/EN: traffic
+multicast_to_unicast=1
+
+
+# =======================================================================
+# --- 9. LOGGING E CONTROLLO ---
+# Traduzione / Translation: 9. LOGGING AND CONTROL
+# =======================================================================
+
+# Moduli di log (-1 = tutti)
+# Traduzione / Translation: Logging modules: -1 means all
+logger_syslog=-1
+
+# Livello minimo: 0=verbose, 1=debug, 2=info, 3=notice, 4=warning
+# Traduzione / Translation: Minimum level: 0 verbose, 1 debug, 2 info, 3 notice, 4 warning
+logger_syslog_level=2
+
+# Socket di controllo per hostapd_cli
+# Traduzione / Translation: Control socket for hostapd_cli
+ctrl_interface=/var/run/hostapd
+ctrl_interface_group=0
+
+
+# =======================================================================
+# --- OPZIONI COMMENTATE (Riferimento) ---
+# Traduzione / Translation: COMMENTED REFERENCE OPTIONS
+# =======================================================================
+#
+# --- Limiti client ---
+# Traduzione / Translation: Client limits
+# max_num_sta=30                       # Numero massimo client connessi | IT/EN: Maximum connected-client count
+#
+# --- WDS ---
+# Traduzione / Translation: WDS
+# wds_sta=1                            # Wireless Distribution System | IT/EN: Sistema di distribuzione wireless
+#
+# --- Tolleranza handshake ---
+# Traduzione / Translation: Handshake tolerance
+# eapol_key_timeout_interval=1000      # Timeout EAPOL più permissivo (ms) | IT/EN: More permissive EAPOL timeout, milliseconds
+# eapol_key_retries=4                  # Tentativi extra per handshake lento | IT/EN: Extra attempts for slow handshakes
+#
+# --- Tuning coda trasmissione ---
+# tx_queue_data2_aifs=1
+# tx_queue_data2_cwmin=7
+# tx_queue_data2_cwmax=15
+# tx_queue_data2_burst=3.0
+# Traduzione / Translation: Transmit-queue tuning: AIFS 1, CWmin 7, CWmax 15, burst 3.0 for tx_queue_data2
+#
+# --- Varie ---
+# Traduzione / Translation: Miscellaneous options
+# disassoc_low_ack=0                   # Non disconnettere client instabili | IT/EN: Do not disconnect unstable clients
+# preamble=1                           # Short preamble | IT/EN: Preambolo corto
+# uapsd_advertisement_enabled=1        # U-APSD (risparmio energetico) | IT/EN: U-APSD power saving
+# utf8_ssid=1                          # SSID con caratteri UTF-8 | IT/EN: SSID with UTF-8 characters
+# Traduzione / Translation: utf8_ssid=1 allows UTF-8 characters in the SSID
+# multi_ap=0                           # Multi-AP (EasyMesh) | IT/EN: Multi-AP / EasyMesh
+# bss_load_update_period=60            # Aggiornamento carico BSS (sec) | IT/EN: BSS-load update interval, seconds
+# chan_util_avg_period=600              # Media utilizzo canale (sec) | IT/EN: Channel-utilization averaging interval, seconds
+#
+# --- Parametri 6 GHz (HE) ---
+# he_6ghz_max_mpdu=0                   # MPDU max (0=3895, 1=7991, 2=11454) | IT/EN: Maximum MPDU: 0=3895, 1=7991, 2=11454
+# he_6ghz_max_ampdu_len_exp=2          # A-MPDU max (2=32k) | IT/EN: Maximum A-MPDU: 2=32k
+# he_6ghz_rx_ant_pat=0                 # Pattern antenna RX variabile | IT/EN: Variable RX antenna pattern
+# he_6ghz_tx_ant_pat=0                 # Pattern antenna TX variabile | IT/EN: Variable TX antenna pattern
+# Traduzione / Translation: 6 GHz HE parameters: MPDU limit options 3895/7991/11454, A-MPDU exponent 2 = 32k, and variable RX/TX
+# IT/EN: antenna patterns
+#
+# MAX-MPDU-11454 non è supportato dal driver di queste MT7915E
+# Traduzione / Translation: MAX-MPDU-11454 is unsupported by the driver of these MT7915E cards
+macaddr_acl=0
+deny_mac_file=/etc/hostapd/6w.deny
+
+# =======================================================================
+# WPS a pulsante: l'associazione si apre dalla dashboard per 120 secondi.
+# PIN e registratori esterni non sono abilitati. Password Wi-Fi conservata.
+# Le due radio condividono l’identità WPS e la stessa finestra di associazione.
+# Traduzione / Translation: Push-button WPS opens from the dashboard for 120 seconds. No PIN or external registrars are enabled,
+# IT/EN: and the Wi-Fi password is retained. Both radios share WPS identity and pairing window.
+# =======================================================================
+wps_state=2
+wps_independent=0
+# UUID identico nei due template: è lo stesso access point.
+# Traduzione / Translation: Use the same UUID in both templates: they are one access point
+uuid=${WPS_UUID}
+ap_setup_locked=1
+config_methods=virtual_push_button
+eap_server=1
+device_name=Pi-Dock-Wifi
+manufacturer=Pi-Lab
+model_name=Pi-Dock-Wifi
+device_type=6-0050F204-1
