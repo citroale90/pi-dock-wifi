@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="README.md">Italiano</a> · <strong>English</strong><br>
-  <a href="docs/en/GUIDE.md">Installation</a> · <a href="docs/en/HARDWARE.md">Hardware</a> · <a href="docs/en/NETWORK.md">DHCP and firewall</a>
+  <a href="docs/en/GUIDE.md">Installation</a> · <a href="docs/en/KERNEL.md">Kernel</a> · <a href="docs/en/HARDWARE.md">Hardware</a> · <a href="docs/en/NETWORK.md">DHCP and firewall</a>
 </p>
 
 # Pi-Dock-Wifi
@@ -37,6 +37,7 @@ Files remain readable and editable: adapt the network, add rules and use Linux t
 | Goal | Guide |
 |---|---|
 | Prepare and start the router | **[Installation and configuration](docs/en/GUIDE.md)** |
+| Build and install the router kernel | **[Kernel build, verification and recovery](docs/en/KERNEL.md)** |
 | Reproduce the hardware and understand `config.txt` | **[Components and assembly](docs/en/HARDWARE.md)** |
 | Modify DHCP, DNS, routing and firewall | **[Networking: files and rules explained](docs/en/NETWORK.md)** |
 | Print supports and the cover | **[Four STL meshes and three SCAD sources](hardware/3d)** |
@@ -102,7 +103,7 @@ Translations are bundled: **Node.js, npm and `package.json` are not required**. 
 
 8 GB Pi 5 · **52Pi P01 / EP-0225 power board** · B14 / ASM1184e · **2× Waveshare MiniPCIe HAT+** · 2× MT7915E · **four-port USB 3.2 Gen1 HUB HAT with USB-C 5 V power input** · N02 adapter and USB-NVMe SSD.
 
-The [full hardware guide](docs/en/HARDWARE.md) covers connections, boot settings and 3D models. Both the **[reference kernel `.config`](hardware/kernel/config.reference)** and **[boot `config.txt`](hardware/boot/config.reference.txt)** are included. The kernel binary is not distributed with this project.
+The [full hardware guide](docs/en/HARDWARE.md) covers connections, boot settings and 3D models. Both the **[reference kernel `.config`](hardware/kernel/config.reference)** and **[boot `config.txt`](hardware/boot/config.reference.txt)** are included, along with a **[build and installation guide](docs/en/KERNEL.md)**. The kernel binary is not distributed with this project.
 
 ## Maintenance and license
 

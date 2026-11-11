@@ -4,7 +4,7 @@
 
 <p align="center">
   <strong>Italiano</strong> · <a href="README.en.md">English</a><br>
-  <a href="docs/it/GUIDA.md">Installazione</a> · <a href="docs/it/HARDWARE.md">Hardware</a> · <a href="docs/it/RETE.md">DHCP e firewall</a>
+  <a href="docs/it/GUIDA.md">Installazione</a> · <a href="docs/it/KERNEL.md">Kernel</a> · <a href="docs/it/HARDWARE.md">Hardware</a> · <a href="docs/it/RETE.md">DHCP e firewall</a>
 </p>
 
 # Pi-Dock-Wifi
@@ -37,6 +37,7 @@ I file restano leggibili e modificabili: puoi adattare la rete, aggiungere regol
 | Obiettivo | Guida |
 |---|---|
 | Preparare e avviare il router | **[Installazione e configurazione](docs/it/GUIDA.md)** |
+| Compilare e installare il kernel del router | **[Guida kernel, verifica e ripristino](docs/it/KERNEL.md)** |
 | Replicare l’hardware e capire `config.txt` | **[Componenti e montaggio](docs/it/HARDWARE.md)** |
 | Modificare DHCP, DNS, routing e firewall | **[Rete: file e regole spiegati](docs/it/RETE.md)** |
 | Stampare supporti e copertura | **[Quattro STL e tre sorgenti SCAD](hardware/3d)** |
@@ -102,7 +103,7 @@ Le traduzioni sono già incluse: **non servono Node.js, npm o file `package.json
 
 Pi 5 da 8 GB · **scheda di alimentazione 52Pi P01 / EP-0225** · B14 / ASM1184e · **2× Waveshare MiniPCIe HAT+** · 2× MT7915E · **hub HAT USB 3.2 Gen1 a quattro porte, alimentazione USB-C 5 V** · adattatore N02 e SSD USB-NVMe.
 
-La [distinta completa](docs/it/HARDWARE.md) comprende collegamenti, impostazioni di boot e modelli 3D. Sono inclusi il **[`.config` del kernel di riferimento](hardware/kernel/config.reference)** e il **[`config.txt` del boot](hardware/boot/config.reference.txt)**. Il binario del kernel non è distribuito con il progetto.
+La [distinta completa](docs/it/HARDWARE.md) comprende collegamenti, impostazioni di boot e modelli 3D. Sono inclusi il **[`.config` del kernel di riferimento](hardware/kernel/config.reference)** e il **[`config.txt` del boot](hardware/boot/config.reference.txt)**, con una **[guida di compilazione e installazione](docs/it/KERNEL.md)**. Il binario del kernel non è distribuito con il progetto.
 
 ## Manutenzione e licenza
 

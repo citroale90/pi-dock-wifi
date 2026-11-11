@@ -1,4 +1,4 @@
-[← README](../../README.md) · [Hardware](HARDWARE.md) · [DHCP e firewall](RETE.md) · [English](../en/GUIDE.md)
+[← README](../../README.md) · [Kernel](KERNEL.md) · [Hardware](HARDWARE.md) · [DHCP e firewall](RETE.md) · [English](../en/GUIDE.md)
 
 # Installazione e configurazione
 
@@ -16,7 +16,7 @@
 | Accesso di recupero | Console o collegamento locale disponibile |
 | Porte libere | Controllare i listener con `ss -lntup` |
 
-Il riferimento hardware è descritto nella [distinta](HARDWARE.md). La [configurazione del kernel](HARDWARE.md#configurazione-del-kernel-inclusa) è inclusa; il binario va preparato separatamente. Docker non sostituisce un driver radio mancante nell’host.
+Il riferimento hardware è descritto nella [distinta](HARDWARE.md). La [configurazione del kernel](HARDWARE.md#configurazione-del-kernel-inclusa) è inclusa; per preparare e installare il binario seguire la **[guida kernel](KERNEL.md)** prima di avviare lo stack. Docker non sostituisce un driver radio mancante nell’host.
 
 > [!IMPORTANT]
 > I container condividono la rete host; il principale è privilegiato e modifica interfacce, bridge, firewall e resolver. La topologia originale ammette uplink→LAN e delega il filtro perimetrale al modem a monte. Non avviare lo stack in parallelo a un’altra copia sullo stesso host.

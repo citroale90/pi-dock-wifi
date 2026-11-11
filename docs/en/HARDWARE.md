@@ -1,4 +1,4 @@
-[← README](../../README.en.md) · [Installation](GUIDE.md) · [DHCP and firewall](NETWORK.md) · [Italiano](../it/HARDWARE.md)
+[← README](../../README.en.md) · [Installation](GUIDE.md) · [Kernel](KERNEL.md) · [DHCP and firewall](NETWORK.md) · [Italiano](../it/HARDWARE.md)
 
 # Hardware and assembly
 
@@ -118,17 +118,11 @@ The full file already contains these router-related settings:
 
 `y` means built into the kernel; `m` requires the matching module from the **same release** in `/lib/modules`. Prepare radio firmware and modules on the host.
 
-To use the reference, enter a **separate source tree at the recorded commit** on ARM64 Linux and adapt the repository path:
+The **[complete build and installation guide](KERNEL.md)** covers pinned sources, a separate output directory, modules, firmware, initramfs, boot selection, checks and recovery. It passes `LOCALVERSION=` explicitly to avoid extra SCM suffixes.
 
-```sh
-cp /path/to/pi-dock-wifi/hardware/kernel/config.reference .config
-make ARCH=arm64 olddefconfig
-make -s ARCH=arm64 kernelrelease
-```
+Check the resulting release and any changes made by `olddefconfig` before building. The file also contains a fallback `CONFIG_CMDLINE` with `root=/dev/mmcblk0p2`; the effective command line comes from the bootloader. Check your system's boot command line and root disk.
 
-Check the resulting release and any changes made by `olddefconfig` before building. The file also contains a fallback `CONFIG_CMDLINE` with `root=/dev/mmcblk0p2`; `CONFIG_CMDLINE_FORCE` is disabled. Check your system's boot command line and root disk.
-
-These commands prepare source configuration; they do not install a kernel. This configuration is separate from [config.txt](../../hardware/boot/config.reference.txt), which selects the boot image. Kernel binaries, modules and firmware are not bundled; a fresh kernel build and boot were not tested during export. References: [Raspberry Pi kernel build guide](https://www.raspberrypi.com/documentation/computers/linux_kernel.html) and [Kconfig](https://docs.kernel.org/kbuild/kconfig.html).
+This configuration is separate from [config.txt](../../hardware/boot/config.reference.txt), which selects the boot image. Kernel binaries, modules and firmware are not bundled; a fresh kernel build and boot were not tested during export. References: [Raspberry Pi kernel build guide](https://www.raspberrypi.com/documentation/computers/linux_kernel.html) and [Kconfig](https://docs.kernel.org/kbuild/kconfig.html).
 
 Check `uname -r`, `lspci -nnk`, `lsusb`, `iw dev`, `iw list`, `ip -br link`, `findmnt /` and `vcgencmd get_throttled`. Radios must support AP mode and the required interface combinations. DFS channels can require a CAC delay.
 

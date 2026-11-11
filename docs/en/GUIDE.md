@@ -1,4 +1,4 @@
-[← README](../../README.en.md) · [Hardware](HARDWARE.md) · [DHCP and firewall](NETWORK.md) · [Italiano](../it/GUIDA.md)
+[← README](../../README.en.md) · [Kernel](KERNEL.md) · [Hardware](HARDWARE.md) · [DHCP and firewall](NETWORK.md) · [Italiano](../it/GUIDA.md)
 
 # Installation and configuration
 
@@ -16,7 +16,7 @@
 | Recovery access | Local console or a recovery connection |
 | Available ports | Inspect listeners with `ss -lntup` |
 
-Read the [hardware guide](HARDWARE.md). The [kernel configuration](HARDWARE.md#included-kernel-configuration) is included; prepare the binary separately. Docker cannot supply a missing host radio driver.
+Read the [hardware guide](HARDWARE.md). The [kernel configuration](HARDWARE.md#included-kernel-configuration) is included; follow the **[kernel guide](KERNEL.md)** to build and install the binary before starting the stack. Docker cannot supply a missing host radio driver.
 
 > [!IMPORTANT]
 > Containers share the host network; the main one is privileged and changes interfaces, bridge, firewall and resolver settings. The original topology permits uplink→LAN forwarding and delegates perimeter filtering to the upstream modem. Do not run two copies on the same host.

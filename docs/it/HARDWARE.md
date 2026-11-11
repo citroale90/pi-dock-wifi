@@ -1,4 +1,4 @@
-[← README](../../README.md) · [Installazione](GUIDA.md) · [DHCP e firewall](RETE.md) · [English](../en/HARDWARE.md)
+[← README](../../README.md) · [Installazione](GUIDA.md) · [Kernel](KERNEL.md) · [DHCP e firewall](RETE.md) · [English](../en/HARDWARE.md)
 
 # Hardware e montaggio
 
@@ -121,17 +121,11 @@ Le opzioni rilevanti per questo router sono già presenti nel file completo:
 
 `y` indica una funzione incorporata nel kernel; `m` richiede il relativo modulo della **stessa release** in `/lib/modules`. Firmware e moduli delle radio vanno preparati sull’host.
 
-Per usare il riferimento, entrare in una **copia separata dei sorgenti corrispondenti al commit indicato**, su Linux ARM64, quindi adattare il percorso del repository:
+La **[guida completa di compilazione e installazione](KERNEL.md)** copre sorgenti fissati al commit indicato, build separata, moduli, firmware, initramfs, selezione del boot, verifiche e ripristino. Mantiene `LOCALVERSION=` esplicito per evitare suffissi SCM aggiuntivi.
 
-```sh
-cp /percorso/pi-dock-wifi/hardware/kernel/config.reference .config
-make ARCH=arm64 olddefconfig
-make -s ARCH=arm64 kernelrelease
-```
+Controllare la release risultante e le differenze introdotte da `olddefconfig` prima di compilare. Il file contiene anche una `CONFIG_CMDLINE` di fallback con `root=/dev/mmcblk0p2`; la riga effettiva arriva dal bootloader. Verificare la riga di boot e il disco root del proprio sistema.
 
-Controllare la release risultante e le differenze introdotte da `olddefconfig` prima di compilare. Il file contiene anche una `CONFIG_CMDLINE` di fallback con `root=/dev/mmcblk0p2`; `CONFIG_CMDLINE_FORCE` è disabilitato. Verificare la riga di boot e il disco root del proprio sistema.
-
-Questi comandi preparano la configurazione dei sorgenti; non installano un kernel. La configurazione non sostituisce [config.txt](../../hardware/boot/config.reference.txt), che seleziona l’immagine al boot. Il binario, i moduli e il firmware non sono distribuiti; una nuova compilazione e il suo avvio non sono stati collaudati durante l’esportazione. Riferimenti: [compilazione Raspberry Pi](https://www.raspberrypi.com/documentation/computers/linux_kernel.html) e [Kconfig](https://docs.kernel.org/kbuild/kconfig.html).
+La configurazione non sostituisce [config.txt](../../hardware/boot/config.reference.txt), che seleziona l’immagine al boot. Il binario, i moduli e il firmware non sono distribuiti; una nuova compilazione e il suo avvio non sono stati collaudati durante l’esportazione. Riferimenti: [compilazione Raspberry Pi](https://www.raspberrypi.com/documentation/computers/linux_kernel.html) e [Kconfig](https://docs.kernel.org/kbuild/kconfig.html).
 
 Comandi di verifica:
 
