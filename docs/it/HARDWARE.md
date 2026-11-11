@@ -79,7 +79,59 @@ Il Raspberry Pi 5 espone una singola lane PCIe. Il B14 suddivide la connettivit�
 
 ## Sistema e kernel osservati
 
-Il riferimento operativo è Debian 13 Trixie ARM64, con kernel custom `6.18.60wifi+`. Il repository non contiene quel binario né una procedura verificata per riprodurlo: è necessario un kernel che riconosca entrambi gli adattatori e consenta AP/bridge. Una build Docker riuscita non dimostra la compatibilità del kernel di un altro Raspberry.
+Il riferimento operativo è Debian 13 Trixie ARM64, con kernel custom `6.18.60wifi+`. Il repository include la sua configurazione completa in [hardware/kernel/config.reference](../../hardware/kernel/config.reference). Serve un kernel host che riconosca entrambi gli adattatori e consenta AP/bridge; Docker non fornisce i driver del kernel.
+
+### Configurazione del kernel inclusa
+
+Il file è una copia integrale del `.config` di riferimento: **9.870 righe**, comprese le opzioni disabilitate. Verifica effettuata l’**11 novembre 2026**:
+
+| Riferimento | Valore verificato |
+|---|---|
+| Kernel in esecuzione | `6.18.60wifi+` |
+| Sorgenti | [raspberrypi/linux](https://github.com/raspberrypi/linux), ramo `rpi-6.18.y` |
+| Commit dei sorgenti | [`a4985478de14`](https://github.com/raspberrypi/linux/commit/a4985478de14b3a83c8e04fed68377c1bdae735d) |
+| File tracciati dei sorgenti | Nessuna modifica locale rilevata rispetto al commit |
+| Compilatore registrato | GCC `14.2.0`, pacchetto Debian `14.2.0-19` |
+| Provenienza della configurazione | Estratta dal modulo `configs` installato; il suo `vermagic` corrisponde al kernel in esecuzione |
+| Confronto con i sorgenti | Identica byte per byte al `.config` della directory di build collegata ai moduli |
+
+SHA-256 del file distribuito:
+
+```text
+2d058adfd4e84ab9d8f102317cad9283d3ed65631f9a3924412cfd8c87de62cb
+```
+
+Le opzioni rilevanti per questo router sono già presenti nel file completo:
+
+| Opzioni | Valore | Ruolo |
+|---|---|---|
+| `CONFIG_ARM64`, `CONFIG_ARCH_BCM2835` | `y` | Architettura ARM64 e piattaforma Raspberry Pi |
+| `CONFIG_ARM64_16K_PAGES` | `y` | Pagine di memoria da 16 KiB |
+| `CONFIG_LOCALVERSION` | `"wifi+"` | Suffisso della release del kernel; distinto dal nome del file di boot |
+| `CONFIG_MODULES` | `y` | Supporto ai moduli caricabili |
+| `CONFIG_PCI`, `CONFIG_PCIE_BRCMSTB` | `y` | Bus PCIe e controller Broadcom |
+| `CONFIG_CFG80211`, `CONFIG_MAC80211` | `m` | Stack wireless del kernel |
+| `CONFIG_MT76_CORE`, `CONFIG_MT7915E` | `m` | Driver delle radio MediaTek MT7915E |
+| `CONFIG_BRIDGE`, `CONFIG_BRIDGE_NETFILTER` | `m` | Bridge LAN e supporto Netfilter sul bridge |
+| `CONFIG_NETFILTER` | `y` | Infrastruttura del firewall |
+| `CONFIG_NF_TABLES`, `CONFIG_NETFILTER_XTABLES`, `CONFIG_IP_NF_IPTABLES`, `CONFIG_NFT_COMPAT` | `m` | Supporti nftables, xtables e compatibilità |
+| `CONFIG_NF_NAT`, `CONFIG_NETFILTER_XT_TARGET_MASQUERADE`, `CONFIG_NETFILTER_XT_TARGET_TCPMSS` | `m` | NAT, masquerade e MSS clamp |
+| `CONFIG_BRIDGE_NF_EBTABLES` | `m` | Supporto ebtables per il bridge |
+| `CONFIG_IKCONFIG` / `CONFIG_IKCONFIG_PROC` | `m` / `y` | Configurazione incorporata nel modulo `configs`; `/proc/config.gz` dipende dal suo caricamento |
+
+`y` indica una funzione incorporata nel kernel; `m` richiede il relativo modulo della **stessa release** in `/lib/modules`. Firmware e moduli delle radio vanno preparati sull’host.
+
+Per usare il riferimento, entrare in una **copia separata dei sorgenti corrispondenti al commit indicato**, su Linux ARM64, quindi adattare il percorso del repository:
+
+```sh
+cp /percorso/pi-dock-wifi/hardware/kernel/config.reference .config
+make ARCH=arm64 olddefconfig
+make -s ARCH=arm64 kernelrelease
+```
+
+Controllare la release risultante e le differenze introdotte da `olddefconfig` prima di compilare. Il file contiene anche una `CONFIG_CMDLINE` di fallback con `root=/dev/mmcblk0p2`; `CONFIG_CMDLINE_FORCE` è disabilitato. Verificare la riga di boot e il disco root del proprio sistema.
+
+Questi comandi preparano la configurazione dei sorgenti; non installano un kernel. La configurazione non sostituisce [config.txt](../../hardware/boot/config.reference.txt), che seleziona l’immagine al boot. Il binario, i moduli e il firmware non sono distribuiti; una nuova compilazione e il suo avvio non sono stati collaudati durante l’esportazione. Riferimenti: [compilazione Raspberry Pi](https://www.raspberrypi.com/documentation/computers/linux_kernel.html) e [Kconfig](https://docs.kernel.org/kbuild/kconfig.html).
 
 Comandi di verifica:
 

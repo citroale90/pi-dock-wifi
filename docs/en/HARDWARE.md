@@ -76,7 +76,61 @@ The B14 shares the Pi’s single exposed PCIe lane; it does not create four inde
 
 ## Host and kernel
 
-The observed host was Debian 13 Trixie ARM64, kernel `6.18.60wifi+`. That custom kernel binary and a verified procedure to reproduce it are **not included**. Docker cannot supply a missing host radio driver. Check `uname -r`, `lspci -nnk`, `lsusb`, `iw dev`, `iw list`, `ip -br link`, `findmnt /` and `vcgencmd get_throttled`. Radios must support AP mode and the required interface combinations. DFS channels can require a CAC delay.
+The reference host runs Debian 13 Trixie ARM64 and custom kernel `6.18.60wifi+`. Its full configuration is included in [hardware/kernel/config.reference](../../hardware/kernel/config.reference). The host kernel must recognize both cards and support AP/bridge operation; Docker does not provide kernel drivers.
+
+### Included kernel configuration
+
+The file is a complete reference `.config`: **9,870 lines**, including disabled options. Verified on **11 November 2026**:
+
+| Reference | Verified value |
+|---|---|
+| Running kernel | `6.18.60wifi+` |
+| Sources | [raspberrypi/linux](https://github.com/raspberrypi/linux), branch `rpi-6.18.y` |
+| Source commit | [`a4985478de14`](https://github.com/raspberrypi/linux/commit/a4985478de14b3a83c8e04fed68377c1bdae735d) |
+| Tracked source files | No local modifications relative to that commit |
+| Recorded compiler | GCC `14.2.0`, Debian package `14.2.0-19` |
+| Configuration origin | Extracted from the installed `configs` module; its `vermagic` matches the running kernel release |
+| Build-tree comparison | Byte-for-byte identical to `.config` in the source tree linked from the installed modules |
+
+SHA-256 of the distributed file:
+
+```text
+2d058adfd4e84ab9d8f102317cad9283d3ed65631f9a3924412cfd8c87de62cb
+```
+
+The full file already contains these router-related settings:
+
+| Options | Value | Role |
+|---|---|---|
+| `CONFIG_ARM64`, `CONFIG_ARCH_BCM2835` | `y` | ARM64 architecture and Raspberry Pi platform |
+| `CONFIG_ARM64_16K_PAGES` | `y` | 16 KiB memory pages |
+| `CONFIG_LOCALVERSION` | `"wifi+"` | Kernel release suffix, separate from the boot image filename |
+| `CONFIG_MODULES` | `y` | Loadable module support |
+| `CONFIG_PCI`, `CONFIG_PCIE_BRCMSTB` | `y` | PCIe bus and Broadcom controller |
+| `CONFIG_CFG80211`, `CONFIG_MAC80211` | `m` | Kernel wireless stack |
+| `CONFIG_MT76_CORE`, `CONFIG_MT7915E` | `m` | MediaTek MT7915E radio drivers |
+| `CONFIG_BRIDGE`, `CONFIG_BRIDGE_NETFILTER` | `m` | LAN bridge and bridge Netfilter support |
+| `CONFIG_NETFILTER` | `y` | Firewall infrastructure |
+| `CONFIG_NF_TABLES`, `CONFIG_NETFILTER_XTABLES`, `CONFIG_IP_NF_IPTABLES`, `CONFIG_NFT_COMPAT` | `m` | nftables, xtables and compatibility support |
+| `CONFIG_NF_NAT`, `CONFIG_NETFILTER_XT_TARGET_MASQUERADE`, `CONFIG_NETFILTER_XT_TARGET_TCPMSS` | `m` | NAT, masquerade and MSS clamping |
+| `CONFIG_BRIDGE_NF_EBTABLES` | `m` | Bridge ebtables support |
+| `CONFIG_IKCONFIG` / `CONFIG_IKCONFIG_PROC` | `m` / `y` | Configuration embedded in the `configs` module; `/proc/config.gz` requires it to be loaded |
+
+`y` means built into the kernel; `m` requires the matching module from the **same release** in `/lib/modules`. Prepare radio firmware and modules on the host.
+
+To use the reference, enter a **separate source tree at the recorded commit** on ARM64 Linux and adapt the repository path:
+
+```sh
+cp /path/to/pi-dock-wifi/hardware/kernel/config.reference .config
+make ARCH=arm64 olddefconfig
+make -s ARCH=arm64 kernelrelease
+```
+
+Check the resulting release and any changes made by `olddefconfig` before building. The file also contains a fallback `CONFIG_CMDLINE` with `root=/dev/mmcblk0p2`; `CONFIG_CMDLINE_FORCE` is disabled. Check your system's boot command line and root disk.
+
+These commands prepare source configuration; they do not install a kernel. This configuration is separate from [config.txt](../../hardware/boot/config.reference.txt), which selects the boot image. Kernel binaries, modules and firmware are not bundled; a fresh kernel build and boot were not tested during export. References: [Raspberry Pi kernel build guide](https://www.raspberrypi.com/documentation/computers/linux_kernel.html) and [Kconfig](https://docs.kernel.org/kbuild/kconfig.html).
+
+Check `uname -r`, `lspci -nnk`, `lsusb`, `iw dev`, `iw list`, `ip -br link`, `findmnt /` and `vcgencmd get_throttled`. Radios must support AP mode and the required interface combinations. DFS channels can require a CAC delay.
 
 ## Boot configuration
 

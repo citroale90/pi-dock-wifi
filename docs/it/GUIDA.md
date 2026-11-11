@@ -16,7 +16,7 @@
 | Accesso di recupero | Console o collegamento locale disponibile |
 | Porte libere | Controllare i listener con `ss -lntup` |
 
-Il riferimento hardware è descritto nella [distinta](HARDWARE.md). Il kernel custom non è incluso: Docker non sostituisce un driver radio mancante nell’host.
+Il riferimento hardware è descritto nella [distinta](HARDWARE.md). La [configurazione del kernel](HARDWARE.md#configurazione-del-kernel-inclusa) è inclusa; il binario va preparato separatamente. Docker non sostituisce un driver radio mancante nell’host.
 
 > [!IMPORTANT]
 > I container condividono la rete host; il principale è privilegiato e modifica interfacce, bridge, firewall e resolver. La topologia originale ammette uplink→LAN e delega il filtro perimetrale al modem a monte. Non avviare lo stack in parallelo a un’altra copia sullo stesso host.
@@ -196,6 +196,7 @@ Consultazione tecnica per area. I file runtime sono già pronti; non serve una f
 | `i18n/en.json` | Catalogo italiano→inglese dei testi dell’interfaccia |
 | `i18n/en` | HTML e CGI inglesi generati dal Dockerfile originale |
 | `hardware/boot/config.reference.txt` | Riferimento boot tecnico, da leggere prima di adattarlo al proprio hardware |
+| `hardware/kernel/config.reference` | `.config` completo del kernel `6.18.60wifi+`, verificato rispetto al modulo installato; configurazione di compilazione distinta dal file di boot |
 | `hardware/3d` | Quattro STL e tre SCAD forniti dal proprietario |
 | `config/i18n.sh` | Testi dei log italiani/inglesi e selezione sicura della lingua; nessun processo esterno per riga |
 | `config/recovery/runtime_i18n.py` | Traduzione dei messaggi diagnostici Python; codici di stato invariati |

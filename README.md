@@ -102,7 +102,7 @@ Le traduzioni sono già incluse: **non servono Node.js, npm o file `package.json
 
 Pi 5 da 8 GB · **scheda di alimentazione 52Pi P01 / EP-0225** · B14 / ASM1184e · **2× Waveshare MiniPCIe HAT+** · 2× MT7915E · **hub HAT USB 3.2 Gen1 a quattro porte, alimentazione USB-C 5 V** · adattatore N02 e SSD USB-NVMe.
 
-La [distinta completa](docs/it/HARDWARE.md) comprende collegamenti, impostazioni di boot e modelli 3D. Il kernel custom del sistema di riferimento non è distribuito con il progetto.
+La [distinta completa](docs/it/HARDWARE.md) comprende collegamenti, impostazioni di boot e modelli 3D. Sono inclusi il **[`.config` del kernel di riferimento](hardware/kernel/config.reference)** e il **[`config.txt` del boot](hardware/boot/config.reference.txt)**. Il binario del kernel non è distribuito con il progetto.
 
 ## Manutenzione e licenza
 

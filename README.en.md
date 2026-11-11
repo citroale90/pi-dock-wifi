@@ -102,7 +102,7 @@ Translations are bundled: **Node.js, npm and `package.json` are not required**. 
 
 8 GB Pi 5 · **52Pi P01 / EP-0225 power board** · B14 / ASM1184e · **2× Waveshare MiniPCIe HAT+** · 2× MT7915E · **four-port USB 3.2 Gen1 HUB HAT with USB-C 5 V power input** · N02 adapter and USB-NVMe SSD.
 
-The [full hardware guide](docs/en/HARDWARE.md) covers connections, boot settings and 3D models. The reference system’s custom kernel is not distributed with this project.
+The [full hardware guide](docs/en/HARDWARE.md) covers connections, boot settings and 3D models. Both the **[reference kernel `.config`](hardware/kernel/config.reference)** and **[boot `config.txt`](hardware/boot/config.reference.txt)** are included. The kernel binary is not distributed with this project.
 
 ## Maintenance and license
 

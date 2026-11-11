@@ -16,7 +16,7 @@
 | Recovery access | Local console or a recovery connection |
 | Available ports | Inspect listeners with `ss -lntup` |
 
-Read the [hardware guide](HARDWARE.md). The custom kernel is not bundled: Docker cannot supply a missing host radio driver.
+Read the [hardware guide](HARDWARE.md). The [kernel configuration](HARDWARE.md#included-kernel-configuration) is included; prepare the binary separately. Docker cannot supply a missing host radio driver.
 
 > [!IMPORTANT]
 > Containers share the host network; the main one is privileged and changes interfaces, bridge, firewall and resolver settings. The original topology permits uplink→LAN forwarding and delegates perimeter filtering to the upstream modem. Do not run two copies on the same host.
@@ -192,6 +192,7 @@ Technical reference by area. Runtime files are ready to use; no npm stage is req
 | `state/uplink`, `logs` | Recovery state/backoff and rotating runtime logs |
 | `i18n/en.json`, `i18n/en` | Translation catalogue and generated English HTML/CGI |
 | `hardware/boot`, `hardware/3d` | Boot reference, four STL meshes and three SCAD sources |
+| `hardware/kernel/config.reference` | Complete `6.18.60wifi+` kernel `.config`, checked against the installed module; build settings separate from the boot file |
 | `config/i18n.sh` | Italian/English log text and safe language selection; no external process per line |
 | `config/recovery/runtime_i18n.py` | Python diagnostic translations; state codes are unchanged |
 | `i18n/logs.json`, `i18n/en.json` | Translation reference catalogues; ready runtime files are bundled |

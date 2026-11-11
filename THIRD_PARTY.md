@@ -7,6 +7,7 @@ The project’s GPL-3.0 license does not replace third-party component licenses.
 | Componente | Sorgente upstream |
 |---|---|
 | Debian e pacchetti / packages | https://www.debian.org/legal/licenses/ |
+| Kernel Raspberry Pi: configurazione di riferimento / reference configuration | https://github.com/raspberrypi/linux |
 | hostapd | https://w1.fi/hostapd/ |
 | fastfetch | https://github.com/fastfetch-cli/fastfetch |
 | Pi-hole | https://github.com/pi-hole/docker-pi-hole |
