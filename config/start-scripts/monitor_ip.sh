@@ -28,6 +28,34 @@ if [[ "${1:-}" == --snapshot ]]; then
     exit 0
 fi
 
+uplink_report() {
+    local reason target address=${UPLINK_IP%/*}
+    case "$UPLINK_STATE" in
+        configured)
+            for target in 1.1.1.1 8.8.8.8 9.9.9.9; do
+                if ping -I "$INTERNET" -c 1 -W 1 "$target" >/dev/null 2>&1; then
+                    printf '[OK] IP: %s - GW: %s - WAN: UP\n' "${UPLINK_IP%/*}" "$UPLINK_GATEWAY"
+                    return
+                fi
+            done
+            reason="nessuna risposta ai ping"
+            ;;
+        no_carrier) reason="cavo scollegato" ;;
+        admin_down) reason="interfaccia disattivata" ;;
+        no_ip) reason="IP assente" ;;
+        no_route) reason="gateway assente" ;;
+        missing) reason="interfaccia assente" ;;
+        not_configured) reason="interfaccia non configurata" ;;
+    esac
+    pdw_translate "$reason"
+    printf '[WARN] IP: %s - GW: %s - WAN: %s\n' "${address:--}" "${UPLINK_GATEWAY:--}" "$PDW_MESSAGE"
+}
+
+if [[ "${1:-}" == --report ]]; then
+    uplink_report
+    exit 0
+fi
+
 # Il percorso resta quello storico: entrypoint -> monitor_ip.sh.
 # Solo questo monitor supervisiona il worker; --snapshot sopra non lo avvia.
 # Traduzione / Translation: Retain the original entrypoint→monitor_ip.sh path. Only this monitor supervises the worker; --snapshot
@@ -56,18 +84,21 @@ ensure_recovery() {
     RECOVERY_RETRY_AT=$(( now + 15 ))
 }
 
-last_state= last_report=0
+last_link= last_message= last_report=0 last_probe=0
 while [[ ! -e /tmp/shutdown_in_progress ]]; do
     uplink_snapshot
     now=$(date +%s)
     ensure_recovery
-    if [[ "$UPLINK_STATE" != "$last_state" ]] || (( now - last_report >= 120 )); then
-        case "$UPLINK_STATE" in
-            configured) log "[INFO] Ethernet $INTERNET configurata: $UPLINK_IP, gateway $UPLINK_GATEWAY. Recupero Ethernet integrato in questo container tramite NetworkManager." ;;
-            no_carrier) log "[WARN] Ethernet $INTERNET: carrier assente. Wi-Fi/LAN mantenuti; attendo il collegamento fisico, nessun reset ciclico." ;;
-            *) log "[WARN] Ethernet $INTERNET: $UPLINK_STATE. Wi-Fi/LAN mantenuti; Il recupero integrato gestisce il ripristino tramite NetworkManager." ;;
-        esac
-        last_state=$UPLINK_STATE; last_report=$now
+    link="$UPLINK_STATE:$UPLINK_IP:$UPLINK_GATEWAY"
+    if [[ "$link" != "$last_link" ]] || (( now - last_probe >= 60 || now - last_report >= 180 )); then
+        message=$(uplink_report)
+        if [[ "$link" != "$last_link" || "$message" != "$last_message" ]] || (( now - last_report >= 180 )); then
+            log "$message"
+            last_report=$now
+        fi
+        last_link=$link
+        last_message=$message
+        last_probe=$now
     fi
     sleep 10 & MONITOR_SLEEP_PID=$!
     wait "$MONITOR_SLEEP_PID" || true

@@ -52,10 +52,10 @@ services:
     - ./config/dhcp/dhclient.conf:/etc/dhcp/dhclient.conf
     - ./config/dhcp/leases/dnsmasq.leases:/var/lib/misc/dnsmasq.leases
     - ./config/start-scripts/start_hostapd.sh:/bin/start_hostapd.sh
-    - ./config/start-scripts/monitor_ip.sh:/bin/monitor_ip.sh
+    - ./config/start-scripts/monitor_ip.sh:/bin/monitor_ip.sh:ro
     - ./config/start-scripts/check_nsswitch.sh:/bin/check_nsswitch.sh
     - ./config/entrypoint.sh:/bin/entrypoint.sh
-    - ./config/healthcheck.sh:/bin/healthcheck.sh
+    - ./config/healthcheck.sh:/bin/healthcheck.sh:ro
     - ./config/logger.sh:/bin/logger.sh
 
   # ────────────────────────────────────────────────────────────────────

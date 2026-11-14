@@ -832,5 +832,53 @@
     "it": "Web asset mancante: {0}",
     "en": "Missing web asset: {0}",
     "arguments": 1
+  },
+  {
+    "id": 140,
+    "it": "nessuna risposta ai ping",
+    "en": "no ping replies",
+    "arguments": 0
+  },
+  {
+    "id": 141,
+    "it": "cavo scollegato",
+    "en": "cable disconnected",
+    "arguments": 0
+  },
+  {
+    "id": 142,
+    "it": "interfaccia disattivata",
+    "en": "interface is down",
+    "arguments": 0
+  },
+  {
+    "id": 143,
+    "it": "IP assente",
+    "en": "no IP address",
+    "arguments": 0
+  },
+  {
+    "id": 144,
+    "it": "gateway assente",
+    "en": "no gateway",
+    "arguments": 0
+  },
+  {
+    "id": 145,
+    "it": "interfaccia assente",
+    "en": "interface missing",
+    "arguments": 0
+  },
+  {
+    "id": 146,
+    "it": "interfaccia non configurata",
+    "en": "interface not configured",
+    "arguments": 0
+  },
+  {
+    "id": 147,
+    "it": "[OK] Healthcheck superato.",
+    "en": "[OK] Health check passed.",
+    "arguments": 0
   }
 ]

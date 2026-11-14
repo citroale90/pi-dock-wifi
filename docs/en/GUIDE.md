@@ -219,6 +219,8 @@ Restart alone does not refresh Compose environment variables. Language covers ne
 
 Translations and reference catalogues are bundled. To customize text, edit the ready runtime files: Italian HTML in the Dockerfile, English assets in `i18n/en`, Bash logs in `config/i18n.sh` and Python diagnostics in `runtime_i18n.py`. Node.js, npm and generators are unnecessary for installing or starting the release.
 
+Every three minutes or so, a stable router logs two independent messages: `[OK] IP: … - GW: … - WAN: UP` and `[OK] Health check passed.` The first requires a ping reply through the configured uplink. If all three targets are silent, the log says `no ping replies`. The second confirms that Wi-Fi, DHCP and LAN routes passed their local checks. Changes and recovery are logged when detected.
+
 ## Updates and shutdown
 
 ```sh

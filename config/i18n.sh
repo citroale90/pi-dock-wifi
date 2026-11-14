@@ -7,6 +7,14 @@ pdw_translate() {
     case "${APP_LANGUAGE:-it}" in
         en)
             case "$PDW_MESSAGE" in
+                'nessuna risposta ai ping') PDW_MESSAGE='no ping replies' ;;
+                'cavo scollegato') PDW_MESSAGE='cable disconnected' ;;
+                'interfaccia disattivata') PDW_MESSAGE='interface is down' ;;
+                'IP assente') PDW_MESSAGE='no IP address' ;;
+                'gateway assente') PDW_MESSAGE='no gateway' ;;
+                'interfaccia assente') PDW_MESSAGE='interface missing' ;;
+                'interfaccia non configurata') PDW_MESSAGE='interface not configured' ;;
+                '[OK] Healthcheck superato.') PDW_MESSAGE='[OK] Health check passed.' ;;
                 'APP_LANGUAGE deve essere it oppure en')
                     pdw_regex='^APP_LANGUAGE\ deve\ essere\ it\ oppure\ en$'
                     if [[ "$PDW_MESSAGE" =~ $pdw_regex ]]; then
@@ -797,6 +805,14 @@ pdw_translate() {
             ;;
         it)
             case "$PDW_MESSAGE" in
+                'no ping replies') PDW_MESSAGE='nessuna risposta ai ping' ;;
+                'cable disconnected') PDW_MESSAGE='cavo scollegato' ;;
+                'interface is down') PDW_MESSAGE='interfaccia disattivata' ;;
+                'no IP address') PDW_MESSAGE='IP assente' ;;
+                'no gateway') PDW_MESSAGE='gateway assente' ;;
+                'interface missing') PDW_MESSAGE='interfaccia assente' ;;
+                'interface not configured') PDW_MESSAGE='interfaccia non configurata' ;;
+                '[OK] Health check passed.') PDW_MESSAGE='[OK] Healthcheck superato.' ;;
                 'APP_LANGUAGE must be it or en')
                     pdw_regex='^APP_LANGUAGE\ must\ be\ it\ or\ en$'
                     if [[ "$PDW_MESSAGE" =~ $pdw_regex ]]; then

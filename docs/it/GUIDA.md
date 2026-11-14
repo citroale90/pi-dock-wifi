@@ -224,6 +224,8 @@ Un semplice restart non aggiorna le variabili Compose. La scelta copre nuove rig
 
 Le traduzioni e i cataloghi di riferimento sono inclusi. Per personalizzare i testi, modificare i file runtime interessati: HTML italiano nel Dockerfile, risorse inglesi in `i18n/en`, log Bash in `config/i18n.sh`, diagnostica Python in `runtime_i18n.py`. Non occorrono Node.js, npm o generatori per installare o avviare la release.
 
+Con rete stabile compaiono circa ogni tre minuti due messaggi indipendenti: `[OK] IP: … - GW: … - WAN: UP` e `[OK] Healthcheck superato.` Il primo richiede una risposta al ping attraverso l’interfaccia configurata. Se nessuno dei tre indirizzi risponde, il log riporta `nessuna risposta ai ping`. Il secondo conferma che Wi-Fi, DHCP e rotte LAN hanno superato i controlli locali. I cambiamenti e il recupero vengono registrati quando sono rilevati.
+
 ## Aggiornamenti e arresto
 
 ```sh

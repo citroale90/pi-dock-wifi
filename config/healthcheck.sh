@@ -283,25 +283,18 @@ fi
 # ==============================================================================
 
 if (( ${#PROBLEMS[@]} == 0 )); then
-    # Tutto OK
-    # Traduzione / Translation: All checks passed
-    reset_fail
-
-    # Log periodico (ogni 4 check = ~2 minuti)
-    # Traduzione / Translation: Periodic log every four checks, approximately two minutes
-    COUNTER_FILE="/tmp/healthcheck_counter"
-    count=$(read_counter "$COUNTER_FILE")
-    count=$(( count + 1 ))
-    echo "$count" > "$COUNTER_FILE"
-
-    if (( count % 4 == 0 )); then
-        uplink=$(/bin/monitor_ip.sh --snapshot 2>/dev/null) || uplink="observer_error"
-        case "$uplink" in
-            configured*) log "[OK] Servizi locali Wi-Fi/DHCP/rotte sani; Ethernet: $uplink. Internet non verificata da questo healthcheck." ;;
-            *) log "[WARN] Servizi locali Wi-Fi/DHCP/rotte sani; Ethernet degradata: $uplink. Nessun riavvio della LAN per un guasto a monte." ;;
-        esac
-        echo "0" > "$COUNTER_FILE"
+    # Docker esegue il controllo ogni 30 secondi. Segnala subito il recupero.
+    # EN: Report every six 30-second checks and immediately after recovery.
+    counter_file=/tmp/healthcheck_counter
+    count=$(read_counter "$counter_file")
+    if [[ ! -s "$counter_file" ]] || (( count >= 5 || $(read_counter "$FAIL_FILE") > 0 )); then
+        log "[OK] Healthcheck superato."
+        count=0
+    else
+        count=$((count + 1))
     fi
+    printf '%s\n' "$count" > "$counter_file"
+    reset_fail
 else
     # Problemi rilevati
     # Traduzione / Translation: Problems detected
